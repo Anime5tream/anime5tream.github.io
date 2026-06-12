@@ -1147,9 +1147,6 @@ function buildStreamtapeFrame(embed) {
                        src.includes('streamtape.to') ||
                        src.includes('streamtape');
   
-  if (!isStreamtape) {
-    return '<div class="player-blocker"><span>Servidor Streamtape no disponible</span></div>';
-  }
   
   return `<iframe src="${src}" 
     allowfullscreen 
