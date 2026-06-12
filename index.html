@@ -949,6 +949,8 @@ function computeRank(){
 /* ── STATE ── */
 const S = {
   page:'home',
+  lastPage: 'home',
+  lastAnimeSlug: null, 
   favs:JSON.parse(localStorage.getItem('as_favs')||'{}'),
   watched:JSON.parse(localStorage.getItem('as_watched')||'{}'),
   hist:JSON.parse(localStorage.getItem('as_hist')||'[]'),
@@ -968,18 +970,17 @@ function persist(){
 
 /* ── ROUTER ── */
 function go(page, data){
-
-  if (S.page && page !== S.page && page !== 'detail' && page !== 'player') {
-    S.lastPage = S.page;
-    S.lastAnimeSlug = null;
-  }
-  
-  if ((page === 'detail' || page === 'player') && data && data.slug) {
-    S.lastAnimeSlug = data.slug;
-  }
-  
-  if (page === 'detail' && data && data.fromPlayer) {
-    S.lastPage = 'player';
+  if (S.page && page !== S.page) {
+   
+    if (page === 'detail' || page === 'player') {
+      S.lastPage = S.page;
+      S.lastAnimeSlug = data?.slug || null;
+    }
+   
+    else if (page !== 'detail' && page !== 'player') {
+      S.lastPage = page;
+      S.lastAnimeSlug = null;
+    }
   }
   
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -1001,58 +1002,59 @@ function go(page, data){
   else if(page==='player'&&data)loadPlayer(data);
   else if(page==='profile')loadProf();
   if(el)el.scrollTop=0;
+  
+ 
+  console.log('Página actual:', S.page, 'Última página:', S.lastPage);
 }
 
 // Si, la llame volver xd
 function volver() {
   const page = S.page;
+  console.log('Volver desde:', page, 'lastPage:', S.lastPage, 'lastAnimeSlug:', S.lastAnimeSlug);
   
-
   if (page === 'player') {
     if (S.lastAnimeSlug) {
       go('detail', { slug: S.lastAnimeSlug });
     } else {
-   
-      const animeTitle = document.querySelector('.player-t')?.innerText;
-      if (animeTitle) {
-        toast('Buscando información del anime...', 'inf');
-
-      }
       go(S.lastPage || 'home');
     }
     return;
   }
   
-
   if (page === 'detail') {
-    go(S.lastPage || 'home');
+    if (S.lastPage && S.lastPage !== 'detail' && S.lastPage !== 'player') {
+      go(S.lastPage);
+    } else {
+      go('home');
+    }
     return;
   }
   
-
   go(S.lastPage || 'home');
 }
-
 
 function getBackButton(animeSlug = null, animeTitle = null) {
   let backText = 'Volver';
   let backAction = 'volver()';
   
-
+  console.log('getBackButton - page:', S.page, 'lastPage:', S.lastPage);
+  
+  // Personalizar según el contexto actual
   if (S.page === 'player') {
     backText = '← Volver al anime';
     if (animeTitle) {
-      backText = `← ${animeTitle}`;
+      const shortTitle = animeTitle.length > 30 ? animeTitle.substring(0, 27) + '...' : animeTitle;
+      backText = `← ${shortTitle}`;
     }
     backAction = `volver()`;
   } else if (S.page === 'detail') {
     const lastPageNames = {
-      'home': '← Inicio',
-      'explore': '← Explorar',
-      'onair': '← En emisión',
-      'favorites': '← Favoritos',
-      'history': '← Historial',
-      'profile': '← Mi perfil'
+      'home': 'Inicio',
+      'explore': 'Explorar',
+      'onair': 'En emisión',
+      'favorites': 'Favoritos',
+      'history': 'Historial',
+      'profile': 'Mi perfil'
     };
     backText = lastPageNames[S.lastPage] || '← Volver';
     backAction = `volver()`;
@@ -1292,6 +1294,7 @@ async function goLatestEp(epSlug,epNumber){
   if (S.page !== 'player') {
     S.lastPage = S.page;
     S.lastAnimeSlug = animeSlug;
+    console.log('goLatestEp - Guardando lastPage:', S.lastPage, 'desde:', S.page);
   }
   
   go('player',{epSlug,animeSlug,animeTitle:'',number:epNumber,allEps:[]});
@@ -1582,16 +1585,17 @@ async function loadDetail(opts){
 function updDetFav(slug){const btn=document.getElementById('det-fav-btn');if(btn)btn.textContent=S.favs[slug]?'En favoritos':'Agregar a favoritos'}
 function switchTab(el,id){el.closest('.page').querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));el.closest('.page').querySelectorAll('.tc').forEach(t=>t.classList.remove('on'));el.classList.add('on');const tc=document.getElementById('tc-'+id);if(tc)tc.classList.add('on')}
 function playEp(animeSlug, animeTitle, epNumber, epSlug, allEps, coverImg){
-
+ 
   if (S.page !== 'player') {
     S.lastPage = S.page;
     S.lastAnimeSlug = animeSlug;
+    console.log('playEp - Guardando lastPage:', S.lastPage, 'desde:', S.page);
   }
   
   const eps=(typeof allEps==='string')?JSON.parse(allEps.replace(/&quot;/g,'"')):allEps;
   go('player',{epSlug,animeSlug,animeTitle,number:epNumber,allEps:eps,coverImg});
 }
-
+  
 /* ── PLAYER ── */
 async function loadPlayer(opts){
   const{epSlug,animeSlug}=opts;let{animeTitle,number,allEps,coverImg}=opts;
