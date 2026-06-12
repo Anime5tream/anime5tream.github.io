@@ -1007,6 +1007,35 @@ function go(page, data){
   console.log('Página actual:', S.page, 'Última página:', S.lastPage);
 }
 
+function toggleFullscreen(element) {
+  if (!element) return;
+  
+  const isFullscreen = document.fullscreenElement || 
+                       document.webkitFullscreenElement || 
+                       document.mozFullScreenElement || 
+                       document.msFullscreenElement;
+  
+  if (isFullscreen) {
+    const exitFullscreen = document.exitFullscreen ||
+                          document.webkitExitFullscreen ||
+                          document.mozCancelFullScreen ||
+                          document.msExitFullscreen;
+    if (exitFullscreen) {
+      exitFullscreen.call(document);
+    }
+    return;
+  }
+  
+  const requestFullscreen = element.requestFullscreen ||
+    element.webkitRequestFullscreen ||
+    element.mozRequestFullScreen ||
+    element.msRequestFullscreen;
+  
+  if (requestFullscreen) {
+    requestFullscreen.call(element);
+  }
+}
+  
 // Si, la llame volver xd
 function volver() {
   const page = S.page;
@@ -1109,13 +1138,11 @@ function sortServers(servers){
 }
 
 function buildStreamtapeFrame(embed) {
-  // Asegurar que la URL tenga los parámetros correctos
   let src = embed;
   if (!src.includes('streamtape.com')) {
     return '<div class="player-blocker"><span>Servidor Streamtape no disponible</span></div>';
   }
   
-  // Agregar parámetros para mejor compatibilidad
   if (!src.includes('?')) {
     src += '?';
   }
@@ -1123,6 +1150,7 @@ function buildStreamtapeFrame(embed) {
     src += '&allowfullscreen=true';
   }
   
+ 
   return `<iframe src="${src}" 
     allowfullscreen 
     allow="autoplay; fullscreen; encrypted-media" 
@@ -1130,10 +1158,11 @@ function buildStreamtapeFrame(embed) {
     sandbox="allow-same-origin allow-scripts allow-forms allow-presentation allow-popups allow-popups-to-escape-sandbox"
     style="width:100%;height:100%;border:none" 
     id="stape-frame"
-    class="streamtape-frame"></iframe>`;
+    class="streamtape-frame"
+    data-source="streamtape"></iframe>`;
 }
+  
 
-// Función para forzar pantalla completa real
 function forceFullscreen(element) {
   if (!element) return;
   
@@ -1149,62 +1178,137 @@ function forceFullscreen(element) {
   return false;
 }
 
-// Función para detectar si un iframe está intentando entrar a pantalla completa
+
 function setupStreamtapeFullscreen() {
   const iframe = document.querySelector('#stape-frame');
   if (!iframe) return;
   
-  // Escuchar mensajes del iframe (Streamtape envía mensajes para pantalla completa)
+  if (!iframe.src || !iframe.src.includes('streamtape')) return;
+  
   window.addEventListener('message', function(event) {
     if (event.data && typeof event.data === 'string') {
       if (event.data.includes('fullscreen') || event.data.includes('requestFullscreen')) {
-        forceFullscreen(iframe);
+        const playerScreen = document.querySelector('.player-screen');
+        if (playerScreen) {
+          toggleFullscreen(playerScreen);
+        }
       }
     }
   });
   
-  // También permitir que el usuario haga doble clic para pantalla completa
+  
   iframe.addEventListener('dblclick', function(e) {
     e.preventDefault();
-    forceFullscreen(iframe);
+    const playerScreen = document.querySelector('.player-screen');
+    if (playerScreen) {
+      toggleFullscreen(playerScreen);
+    }
   });
 }
 
 // Función para crear un botón flotante de pantalla completa
+// Función para crear un botón flotante de pantalla completa (SOLO para Streamtape)
 function addFullscreenButton() {
   const playerScreen = document.querySelector('.player-screen');
   if (!playerScreen || playerScreen.querySelector('.fullscreen-btn')) return;
   
+  const iframe = playerScreen.querySelector('iframe');
+  if (!iframe) return;
+  
+  const isStreamtape = iframe.src && iframe.src.includes('streamtape');
+  
+  if (!isStreamtape) return;
+  
   const btn = document.createElement('div');
   btn.className = 'fullscreen-btn';
-  btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>';
-  btn.title = 'Pantalla completa (F)';
-  btn.onclick = () => {
-    const iframe = playerScreen.querySelector('iframe');
-    if (iframe) forceFullscreen(iframe);
+  btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+  </svg>`;
+  btn.title = 'Pantalla completa (F) - Presiona ESC para salir';
+  
+  function updateButtonIcon() {
+    const isFullscreen = document.fullscreenElement || 
+                        document.webkitFullscreenElement || 
+                        document.mozFullScreenElement;
+    if (isFullscreen) {
+      btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/>
+      </svg>`;
+      btn.title = 'Salir de pantalla completa (ESC)';
+    } else {
+      btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+      </svg>`;
+      btn.title = 'Pantalla completa (F) - Presiona ESC para salir';
+    }
+  }
+  
+  btn.onclick = (e) => {
+    e.stopPropagation();
+    const currentIframe = playerScreen.querySelector('iframe');
+    if (currentIframe && currentIframe.src && currentIframe.src.includes('streamtape')) {
+      toggleFullscreen(playerScreen);
+      setTimeout(updateButtonIcon, 100);
+    }
   };
+  
   playerScreen.style.position = 'relative';
   playerScreen.appendChild(btn);
   
-  // También tecla F para pantalla completa
+  document.addEventListener('fullscreenchange', updateButtonIcon);
+  document.addEventListener('webkitfullscreenchange', updateButtonIcon);
+  document.addEventListener('mozfullscreenchange', updateButtonIcon);
+  
+
   document.addEventListener('keydown', (e) => {
     if (e.key === 'f' || e.key === 'F') {
-      const iframe = document.querySelector('.player-screen iframe');
-      if (iframe && document.activeElement !== iframe) {
+      const currentIframe = document.querySelector('.player-screen iframe');
+      if (currentIframe && currentIframe.src && currentIframe.src.includes('streamtape')) {
         e.preventDefault();
-        forceFullscreen(iframe);
+        toggleFullscreen(document.querySelector('.player-screen'));
+        setTimeout(updateButtonIcon, 100);
       }
     }
   });
+  
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const isFullscreen = document.fullscreenElement || 
+                          document.webkitFullscreenElement || 
+                          document.mozFullScreenElement;
+      if (isFullscreen) {
+        updateButtonIcon();
+      }
+    }
+  });
+  
+  updateButtonIcon();
 }
 
 function buildIframe(srv){
   if(!srv||!srv.embed)return'<div class="player-blocker"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><polygon points="5,3 19,12 5,21"/></svg><span>Servidor no disponible</span></div>';
   const name=(srv.name||'').toLowerCase(),embed=(srv.embed||'').toLowerCase();
-  if(embed.includes('mega')||name.includes('mega'))return'<iframe src="'+srv.embed+'" allowfullscreen allow="autoplay; fullscreen; encrypted-media" referrerpolicy="no-referrer" style="width:100%;height:100%;border:none"></iframe>';
-  if(name==='sw'||name.includes('sw'))return'<iframe src="'+srv.embed+'" allowfullscreen allow="autoplay; fullscreen" referrerpolicy="no-referrer" style="width:100%;height:100%;border:none"></iframe>';
-  if(embed.includes('1fichier')||name.includes('1fichier')){const match=srv.embed.match(/1fichier\.com\/\?([a-zA-Z0-9]+)/);if(match)return'<iframe src="https://1fichier.com/embed/'+match[1]+'" allowfullscreen allow="autoplay; fullscreen" style="width:100%;height:100%;border:none" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>';}
-  if(embed.includes('streamtape')||name.includes('streamtape')||embed.includes('streamto')||name.includes('streamto')||embed.includes('tpead'))return buildStreamtapeFrame(srv.embed);
+  
+  // Mega -
+  if(embed.includes('mega')||name.includes('mega')) {
+    return'<iframe src="'+srv.embed+'" allowfullscreen allow="autoplay; fullscreen; encrypted-media" referrerpolicy="no-referrer" style="width:100%;height:100%;border:none" data-source="mega"></iframe>';
+  }
+  
+  // SW / Streamtape
+  if(name==='sw'||name.includes('sw')) {
+    return buildStreamtapeFrame(srv.embed);
+  }
+  
+  if(embed.includes('1fichier')||name.includes('1fichier')) {
+    const match=srv.embed.match(/1fichier\.com\/\?([a-zA-Z0-9]+)/);
+    if(match) return'<iframe src="https://1fichier.com/embed/'+match[1]+'" allowfullscreen allow="autoplay; fullscreen" style="width:100%;height:100%;border:none" sandbox="allow-same-origin allow-scripts allow-popups allow-forms" data-source="1fichier"></iframe>';
+  }
+  
+  if(embed.includes('streamtape')||name.includes('streamtape')||embed.includes('streamto')||name.includes('streamto')||embed.includes('tpead')) {
+    return buildStreamtapeFrame(srv.embed);
+  }
+  
   return'<iframe src="'+srv.embed+'" allowfullscreen allow="autoplay; fullscreen" referrerpolicy="no-referrer" style="width:100%;height:100%;border:none"></iframe>';
 }
 
