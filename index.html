@@ -779,6 +779,57 @@ img{max-width:100%;display:block}
 .back-btn:hover svg {
   transform: translateX(-3px);
 }
+
+.player-screen:-webkit-full-screen {
+  width: 100% !important;
+  height: 100% !important;
+  background: #000;
+  padding-top: 0 !important;
+}
+
+.player-screen:fullscreen {
+  width: 100% !important;
+  height: 100% !important;
+  background: #000;
+  padding-top: 0 !important;
+}
+
+.player-screen:-webkit-full-screen iframe,
+.player-screen:fullscreen iframe {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+}
+
+
+@media (max-width: 768px) {
+  .player-screen:-webkit-full-screen {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 9999 !important;
+  }
+}
+
+.player-screen iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  object-fit: contain;
+}
+
+.player-screen:-webkit-full-screen iframe,
+.player-screen:fullscreen iframe {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+}
 </style>
 </head>
 <body>
@@ -1201,12 +1252,56 @@ function setupStreamtapeFullscreen() {
   
   if (!iframe.src || !iframe.src.includes('streamtape')) return;
   
-  iframe.addEventListener('dblclick', function(e) {
+  let lastTap = 0;
+  let lastClick = 0;
+  
+ 
+  const handleDoubleTapOrClick = (e) => {
     e.preventDefault();
+    e.stopPropagation();
+    
     const playerScreen = document.querySelector('.player-screen');
-    if (playerScreen) {
-      toggleFullscreen(playerScreen);
+    if (!playerScreen) return;
+    
+    const isFullscreen = document.fullscreenElement || 
+                        document.webkitFullscreenElement || 
+                        document.mozFullScreenElement;
+    
+    if (isFullscreen) {
+      const exitFullscreen = document.exitFullscreen ||
+                            document.webkitExitFullscreen ||
+                            document.mozCancelFullScreen ||
+                            document.msExitFullscreen;
+      if (exitFullscreen) {
+        exitFullscreen.call(document);
+      }
+    } else {
+
+      const requestFullscreen = playerScreen.requestFullscreen ||
+                                playerScreen.webkitRequestFullscreen ||
+                                playerScreen.mozRequestFullScreen ||
+                                playerScreen.msRequestFullscreen;
+      if (requestFullscreen) {
+        requestFullscreen.call(playerScreen);
+      }
     }
+  };
+  
+  iframe.addEventListener('dblclick', (e) => {
+    e.preventDefault();
+    handleDoubleTapOrClick(e);
+  });
+  
+  iframe.addEventListener('touchstart', (e) => {
+    const currentTime = new Date().getTime();
+    const tapLength = currentTime - lastTap;
+    
+    if (tapLength < 300 && tapLength > 0) {
+      e.preventDefault();
+      e.stopPropagation();
+      handleDoubleTapOrClick(e);
+    }
+    lastTap = currentTime;
   });
 }
   
@@ -1260,10 +1355,13 @@ function addFullscreenButton() {
     }
     
     btn.onclick = (e) => {
-      e.stopPropagation();
-      toggleFullscreen(playerScreen);
-      setTimeout(updateButtonIcon, 100);
-    };
+  e.stopPropagation();
+  const playerScreen = document.querySelector('.player-screen');
+  if (playerScreen) {
+    toggleFullscreen(playerScreen);
+  }
+  setTimeout(updateButtonIcon, 100);
+};
     
     // Para móvil: feedback táctil
     btn.addEventListener('touchstart', (e) => {
