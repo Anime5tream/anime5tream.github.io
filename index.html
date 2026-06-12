@@ -5,7 +5,7 @@
 
 <title>AnimeStream</title>
 
-<meta name="description" content="Mira anime online gratis en AnimeStream.">
+<meta name="description" content="Una pagina para ver anime sin anuncios :D">
 
 <!-- Open Graph -->
 <meta property="og:title" content="AnimeStream">
@@ -1041,10 +1041,10 @@ function getBackButton(animeSlug = null, animeTitle = null) {
   
   // Personalizar según el contexto actual
   if (S.page === 'player') {
-    backText = '← Volver al anime';
+    backText = 'Volver al anime';
     if (animeTitle) {
       const shortTitle = animeTitle.length > 30 ? animeTitle.substring(0, 27) + '...' : animeTitle;
-      backText = `← ${shortTitle}`;
+      backText = `${shortTitle}`;
     }
     backAction = `volver()`;
   } else if (S.page === 'detail') {
@@ -1056,7 +1056,7 @@ function getBackButton(animeSlug = null, animeTitle = null) {
       'history': 'Historial',
       'profile': 'Mi perfil'
     };
-    backText = lastPageNames[S.lastPage] || '← Volver';
+    backText = lastPageNames[S.lastPage] || 'Volver';
     backAction = `volver()`;
   }
   
