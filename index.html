@@ -648,6 +648,114 @@ img{max-width:100%;display:block}
     }
 }
 
+/* Mejorar experiencia de pantalla completa */
+.player-screen iframe:-webkit-full-screen {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+}
+
+.player-screen iframe:fullscreen {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+}
+
+/* Botón de pantalla completo personalizado (opcional) */
+.fullscreen-btn {
+  position: absolute;
+  bottom: 70px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.7);
+  border: 1px solid rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s;
+  color: white;
+}
+
+.fullscreen-btn:hover {
+  background: var(--accent);
+  transform: scale(1.05);
+}
+
+/* Mejorar experiencia de pantalla completa */
+.player-screen iframe:-webkit-full-screen {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+}
+
+.player-screen iframe:fullscreen {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+}
+
+/* Botón de pantalla completo personalizado */
+.fullscreen-btn {
+  position: absolute;
+  bottom: 70px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.7);
+  border: 1px solid rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s;
+  color: white;
+  backdrop-filter: blur(4px);
+}
+
+.fullscreen-btn:hover {
+  background: var(--accent);
+  transform: scale(1.05);
+  border-color: var(--accent);
+}
+
+/* Botón de volver mejorado */
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
+  cursor: pointer;
+  margin-bottom: 18px;
+  transition: all 0.2s;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 8px 16px;
+  font-family: var(--font);
+}
+
+.back-btn:hover {
+  color: var(--text);
+  background: var(--surface);
+  border-color: var(--border2);
+  transform: translateX(-3px);
+}
+
+.back-btn svg {
+  transition: transform 0.2s;
+}
+
+.back-btn:hover svg {
+  transform: translateX(-3px);
+}
 </style>
 </head>
 <body>
@@ -847,7 +955,10 @@ const S = {
   prof:JSON.parse(localStorage.getItem('as_prof')||'{"uname":"","bio":"","ava":"","banner":""}'),
   heroItems:[],heroIdx:0,heroTimer:null,
   exploreCache:{},exploreFilter:'all',exploreQuery:'',expSearchTimer:null,
+   lastPage: 'home', 
+  lastAnimeSlug: null, 
 };
+  
 function persist(){
   localStorage.setItem('as_favs',JSON.stringify(S.favs));
   localStorage.setItem('as_watched',JSON.stringify(S.watched));
@@ -856,7 +967,21 @@ function persist(){
 }
 
 /* ── ROUTER ── */
-function go(page,data){
+function go(page, data){
+
+  if (S.page && page !== S.page && page !== 'detail' && page !== 'player') {
+    S.lastPage = S.page;
+    S.lastAnimeSlug = null;
+  }
+  
+  if ((page === 'detail' || page === 'player') && data && data.slug) {
+    S.lastAnimeSlug = data.slug;
+  }
+  
+  if (page === 'detail' && data && data.fromPlayer) {
+    S.lastPage = 'player';
+  }
+  
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.s-item').forEach(i=>i.classList.remove('active'));
   const el=document.getElementById('page-'+page);
@@ -876,6 +1001,70 @@ function go(page,data){
   else if(page==='player'&&data)loadPlayer(data);
   else if(page==='profile')loadProf();
   if(el)el.scrollTop=0;
+}
+
+// Si, la llame volver xd
+function volver() {
+  const page = S.page;
+  
+
+  if (page === 'player') {
+    if (S.lastAnimeSlug) {
+      go('detail', { slug: S.lastAnimeSlug });
+    } else {
+   
+      const animeTitle = document.querySelector('.player-t')?.innerText;
+      if (animeTitle) {
+        toast('Buscando información del anime...', 'inf');
+
+      }
+      go(S.lastPage || 'home');
+    }
+    return;
+  }
+  
+
+  if (page === 'detail') {
+    go(S.lastPage || 'home');
+    return;
+  }
+  
+
+  go(S.lastPage || 'home');
+}
+
+
+function getBackButton(animeSlug = null, animeTitle = null) {
+  let backText = 'Volver';
+  let backAction = 'volver()';
+  
+
+  if (S.page === 'player') {
+    backText = '← Volver al anime';
+    if (animeTitle) {
+      backText = `← ${animeTitle}`;
+    }
+    backAction = `volver()`;
+  } else if (S.page === 'detail') {
+    const lastPageNames = {
+      'home': '← Inicio',
+      'explore': '← Explorar',
+      'onair': '← En emisión',
+      'favorites': '← Favoritos',
+      'history': '← Historial',
+      'profile': '← Mi perfil'
+    };
+    backText = lastPageNames[S.lastPage] || '← Volver';
+    backAction = `volver()`;
+  }
+  
+  return `<button class="back-btn" onclick="${backAction}">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <line x1="19" y1="12" x2="5" y2="12"/>
+      <polyline points="12,19 5,12 12,5"/>
+    </svg>
+    ${backText}
+  </button>`;
 }
 
 /* ── SIDEBAR ── */
@@ -916,9 +1105,97 @@ function sortServers(servers){
   }
   return servers.slice().sort((a,b)=>priority(a)-priority(b));
 }
-function buildStreamtapeFrame(embed){
-  return'<iframe src="'+embed+'" allowfullscreen allow="autoplay; fullscreen; encrypted-media" referrerpolicy="no-referrer" sandbox="allow-same-origin allow-scripts allow-forms allow-presentation" style="width:100%;height:100%;border:none" id="stape-frame"></iframe>';
+
+function buildStreamtapeFrame(embed) {
+  // Asegurar que la URL tenga los parámetros correctos
+  let src = embed;
+  if (!src.includes('streamtape.com')) {
+    return '<div class="player-blocker"><span>Servidor Streamtape no disponible</span></div>';
+  }
+  
+  // Agregar parámetros para mejor compatibilidad
+  if (!src.includes('?')) {
+    src += '?';
+  }
+  if (!src.includes('allowfullscreen')) {
+    src += '&allowfullscreen=true';
+  }
+  
+  return `<iframe src="${src}" 
+    allowfullscreen 
+    allow="autoplay; fullscreen; encrypted-media" 
+    referrerpolicy="no-referrer" 
+    sandbox="allow-same-origin allow-scripts allow-forms allow-presentation allow-popups allow-popups-to-escape-sandbox"
+    style="width:100%;height:100%;border:none" 
+    id="stape-frame"
+    class="streamtape-frame"></iframe>`;
 }
+
+// Función para forzar pantalla completa real
+function forceFullscreen(element) {
+  if (!element) return;
+  
+  const requestFullscreen = element.requestFullscreen ||
+    element.webkitRequestFullscreen ||
+    element.mozRequestFullScreen ||
+    element.msRequestFullscreen;
+  
+  if (requestFullscreen) {
+    requestFullscreen.call(element);
+    return true;
+  }
+  return false;
+}
+
+// Función para detectar si un iframe está intentando entrar a pantalla completa
+function setupStreamtapeFullscreen() {
+  const iframe = document.querySelector('#stape-frame');
+  if (!iframe) return;
+  
+  // Escuchar mensajes del iframe (Streamtape envía mensajes para pantalla completa)
+  window.addEventListener('message', function(event) {
+    if (event.data && typeof event.data === 'string') {
+      if (event.data.includes('fullscreen') || event.data.includes('requestFullscreen')) {
+        forceFullscreen(iframe);
+      }
+    }
+  });
+  
+  // También permitir que el usuario haga doble clic para pantalla completa
+  iframe.addEventListener('dblclick', function(e) {
+    e.preventDefault();
+    forceFullscreen(iframe);
+  });
+}
+
+// Función para crear un botón flotante de pantalla completa
+function addFullscreenButton() {
+  const playerScreen = document.querySelector('.player-screen');
+  if (!playerScreen || playerScreen.querySelector('.fullscreen-btn')) return;
+  
+  const btn = document.createElement('div');
+  btn.className = 'fullscreen-btn';
+  btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>';
+  btn.title = 'Pantalla completa (F)';
+  btn.onclick = () => {
+    const iframe = playerScreen.querySelector('iframe');
+    if (iframe) forceFullscreen(iframe);
+  };
+  playerScreen.style.position = 'relative';
+  playerScreen.appendChild(btn);
+  
+  // También tecla F para pantalla completa
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'f' || e.key === 'F') {
+      const iframe = document.querySelector('.player-screen iframe');
+      if (iframe && document.activeElement !== iframe) {
+        e.preventDefault();
+        forceFullscreen(iframe);
+      }
+    }
+  });
+}
+
 function buildIframe(srv){
   if(!srv||!srv.embed)return'<div class="player-blocker"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><polygon points="5,3 19,12 5,21"/></svg><span>Servidor no disponible</span></div>';
   const name=(srv.name||'').toLowerCase(),embed=(srv.embed||'').toLowerCase();
@@ -1011,6 +1288,12 @@ function renderLatest(data){
 }
 async function goLatestEp(epSlug,epNumber){
   const animeSlug=epSlug.replace(/-\d+$/,'');
+  
+  if (S.page !== 'player') {
+    S.lastPage = S.page;
+    S.lastAnimeSlug = animeSlug;
+  }
+  
   go('player',{epSlug,animeSlug,animeTitle:'',number:epNumber,allEps:[]});
 }
 
@@ -1181,12 +1464,16 @@ function loadHist(){
   }).join('');
 }
 
-/* ── DETAIL — Netflix-style episode grid, paginated 5 at a time ── */
+
 async function loadDetail(opts){
   const slug=opts.slug,body=document.getElementById('det-body');
   body.innerHTML='<div class="load"><div class="spin"></div><span>Cargando...</span></div>';
   const data=await req('/api/anime/'+slug);
   if(!data){body.innerHTML='<div style="color:var(--text3);padding:40px 0;text-align:center">No se pudo cargar el anime.</div>';return;}
+  
+ 
+  S.currentAnimeSlug = slug;
+  
   const on=!!S.favs[slug],cv=data.cover||cover(slug);
   const statusMap={'En emision':'b-green','Finalizado':'b-gray','Proximamente':'b-amber'};
   const eps=data.episodes||[],epsJson=JSON.stringify(eps).replace(/"/g,'&quot;');
@@ -1196,8 +1483,11 @@ async function loadDetail(opts){
   let relatedBlock='';
   if(data.related&&data.related.length)relatedBlock='<div class="tc" id="tc-rel"><div class="anime-grid">'+data.related.map(r=>'<div class="ac" onclick="go(\'detail\',{slug:\''+r.slug+'\'})">' +mkImg(cover(r.slug),'ac-poster',r.title)+'<div class="ac-body"><div class="ac-title">'+(r.title||'Sin titulo')+'</div><div class="ac-meta">'+(r.relation||'')+'</div></div></div>').join('')+'</div></div>';
 
-  body.innerHTML=
-    '<button class="back-btn" onclick="history.go(-1)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12,19 5,12 12,5"/></svg>Volver</button>'+
+
+  const backButton = getBackButton(slug, data.title);
+  
+  body.innerHTML =
+    backButton +
     '<div class="det-hero"><div class="det-hero-bg" style="background-image:url(\''+cv+'\')"></div><div class="det-hero-grad"></div>'+
     '<div class="det-hero-body">'+mkImg(cv,'det-poster',data.title)+
     '<div class="det-info"><div class="det-title">'+(data.title||'Sin titulo')+'</div>'+
@@ -1210,8 +1500,8 @@ async function loadDetail(opts){
     '<div class="tc" id="tc-info"><div class="info-grid">'+infoRows+'</div>'+(data.genres&&data.genres.length?'<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text3);margin-bottom:7px">Generos</div>'+data.genres.map(g=>'<span class="genre-tag">'+g+'</span>').join('')+'</div>':'')+
     (data.alternative_titles&&data.alternative_titles.filter(Boolean).length?'<div><div style="font-size:11px;color:var(--text3);margin-bottom:6px">Titulos alternativos</div>'+data.alternative_titles.filter(Boolean).map(t=>'<div style="font-size:13px;color:var(--text2);margin-bottom:3px">'+t+'</div>').join('')+'</div>':'')+'</div>'+relatedBlock;
 
-  // NUEVA FUNCIÓN: Episodios estilo Netflix (lep-card) con grid de 5 columnas
-  const epsAsc = eps.slice(); // mantener orden ascendente
+ 
+  const epsAsc = eps.slice(); 
   const EPISODES_PER_PAGE = 5;
   let currentEpPage = 0;
   
@@ -1244,7 +1534,7 @@ async function loadDetail(opts){
       '</div>';
     }).join('');
     
-    // Crear o obtener el grid
+  
     let grid = container.querySelector('.episodes-grid');
     if (!grid) {
       grid = document.createElement('div');
@@ -1253,11 +1543,11 @@ async function loadDetail(opts){
     }
     grid.insertAdjacentHTML('beforeend', cardsHtml);
     
-    // Remover botón de carga anterior si existe
+  
     let oldBtn = container.querySelector('.load-more-episodes');
     if (oldBtn) oldBtn.remove();
     
-    // Agregar botón "Cargar más" si hay más episodios
+    
     if ((currentEpPage + 1) * EPISODES_PER_PAGE < epsAsc.length) {
       const remaining = epsAsc.length - (currentEpPage + 1) * EPISODES_PER_PAGE;
       const btnDiv = document.createElement('div');
@@ -1276,22 +1566,28 @@ async function loadDetail(opts){
     currentEpPage++;
   }
   
-  // Función global para cargar más
+ 
   window.loadMoreEpisodes = function() {
     renderNetflixEpisodes();
   };
   
-  // Cargar primera página si hay episodios
+
   if (epsAsc.length) {
     renderNetflixEpisodes();
   } else {
     document.getElementById('episodes-container').innerHTML = '<div style="color:var(--text3);font-size:13px;padding:14px 0">Sin episodios disponibles.</div>';
   }
 }
-
+  
 function updDetFav(slug){const btn=document.getElementById('det-fav-btn');if(btn)btn.textContent=S.favs[slug]?'En favoritos':'Agregar a favoritos'}
 function switchTab(el,id){el.closest('.page').querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));el.closest('.page').querySelectorAll('.tc').forEach(t=>t.classList.remove('on'));el.classList.add('on');const tc=document.getElementById('tc-'+id);if(tc)tc.classList.add('on')}
-function playEp(animeSlug,animeTitle,epNumber,epSlug,allEps,coverImg){
+function playEp(animeSlug, animeTitle, epNumber, epSlug, allEps, coverImg){
+
+  if (S.page !== 'player') {
+    S.lastPage = S.page;
+    S.lastAnimeSlug = animeSlug;
+  }
+  
   const eps=(typeof allEps==='string')?JSON.parse(allEps.replace(/&quot;/g,'"')):allEps;
   go('player',{epSlug,animeSlug,animeTitle,number:epNumber,allEps:eps,coverImg});
 }
@@ -1302,6 +1598,7 @@ async function loadPlayer(opts){
   animeTitle=animeTitle||'';number=number||0;allEps=allEps||[];coverImg=coverImg||cover(animeSlug);
   const body=document.getElementById('play-body');
   body.innerHTML='<div class="load"><div class="spin"></div><span>Cargando episodio...</span></div>';
+  
   const data=await req('/api/anime/episode/'+epSlug);
   if(!data){body.innerHTML='<div style="color:var(--text3);padding:40px 0;text-align:center">No se pudo cargar el episodio.<br><button class="btn btn-ghost" style="margin-top:12px" onclick="go(\'detail\',{slug:\''+animeSlug+'\'})">Volver al anime</button></div>';return;}
   if(!allEps.length){const ad=await req('/api/anime/'+animeSlug);if(ad&&ad.episodes){allEps=ad.episodes;if(!animeTitle&&ad.title)animeTitle=ad.title;if(!coverImg||coverImg===cover(animeSlug))coverImg=ad.cover||cover(animeSlug);}}
@@ -1316,14 +1613,31 @@ async function loadPlayer(opts){
   const nextBtn=next?'<button class="btn btn-primary btn-sm" onclick="go(\'player\',{epSlug:\''+next.slug+'\',animeSlug:\''+animeSlug+'\',animeTitle:\''+safeStr(animeTitle)+'\',number:'+next.number+',allEps:'+epsJson+',coverImg:\''+cvSafe+'\'})">Siguiente<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/></svg></button>':'';
   let epListHtml='';
   if(eps.length)epListHtml='<div style="margin-top:22px"><div class="sec-head"><div class="sec-title" style="font-size:16px">Lista de episodios</div></div><div class="ep-list">'+eps.slice().reverse().slice(0,40).map(ep=>{const w=isWatched(animeSlug,ep.number),cur=ep.number===epNumber;return'<div class="el-item'+(w?' watched':'')+(cur?' current':'')+'" onclick="go(\'player\',{epSlug:\''+ep.slug+'\',animeSlug:\''+animeSlug+'\',animeTitle:\''+safeStr(animeTitle)+'\',number:'+ep.number+',allEps:'+epsJson+',coverImg:\''+cvSafe+'\'})">' +'<div class="el-num">'+(cur?playSvg(10):w?checkSvg():ep.number)+'</div>'+'<div class="el-meta"><div class="el-ltitle">Episodio '+ep.number+'</div><div class="el-lsub">'+(cur?'Reproduciendo':w?'Visto':'Sin ver')+'</div></div></div>';}).join('')+'</div></div>';
-  body.innerHTML=
-    '<button class="back-btn" onclick="go(\'detail\',{slug:\''+animeSlug+'\'})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12,19 5,12 12,5"/></svg>'+(animeTitle||data.title||'Volver')+'</button>'+
+  
+
+  const backButton = getBackButton(animeSlug, animeTitle || data.title);
+  
+  body.innerHTML =
+    backButton +
     '<div class="player-wrap"><div class="player-top"><div><div class="player-t">'+(data.title||animeTitle||'Episodio')+'</div><div class="player-sub">Episodio '+epNumber+' &middot; '+sorted.length+' servidor'+(sorted.length!==1?'es':'')+'</div></div>'+
     '<button class="btn btn-secondary btn-sm" onclick="toggleFav(\''+animeSlug+'\',\''+safeStr(animeTitle||'')+'\',\''+cvSafe+'\',event)">'+(S.favs[animeSlug]?'En favoritos':'Guardar anime')+'</button></div>'+
     '<div class="player-screen" id="pscreen">'+buildIframe(sorted[0])+'</div>'+
     '<div class="player-foot"><span class="srv-label">Servidor:</span>'+srvBtns+dlLinks+'<div class="pnav">'+prevBtn+nextBtn+'</div></div></div>'+epListHtml;
+  
   window.__sortedSrvs=sorted;
-  window.switchSrv=function(i){document.querySelectorAll('.srv-btn').forEach((b,j)=>b.classList.toggle('on',i===j));document.getElementById('pscreen').innerHTML=buildIframe(window.__sortedSrvs[i])};
+  window.switchSrv=function(i){document.querySelectorAll('.srv-btn').forEach((b,j)=>b.classList.toggle('on',i===j));document.getElementById('pscreen').innerHTML=buildIframe(window.__sortedSrvs[i]);
+ 
+    setTimeout(() => {
+      setupStreamtapeFullscreen();
+      addFullscreenButton();
+    }, 500);
+  };
+  
+ 
+  setTimeout(() => {
+    setupStreamtapeFullscreen();
+    addFullscreenButton();
+  }, 500);
 }
 
 /* ── TOPBAR SEARCH ── */
