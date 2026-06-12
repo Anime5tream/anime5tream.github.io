@@ -1138,21 +1138,18 @@ function sortServers(servers){
 }
 
 function buildStreamtapeFrame(embed) {
-
   let src = embed;
   
-
   const isStreamtape = src.includes('streamtape.com') || 
                        src.includes('streamtape.net') || 
                        src.includes('streamtape.to') ||
                        src.includes('streamtape');
   
-  
+ 
   return `<iframe src="${src}" 
     allowfullscreen 
     allow="autoplay; fullscreen; encrypted-media" 
-    referrerpolicy="no-referrer" 
-    sandbox="allow-same-origin allow-scripts allow-forms allow-presentation allow-popups allow-popups-to-escape-sandbox"
+    referrerpolicy="no-referrer"
     style="width:100%;height:100%;border:none" 
     id="stape-frame"
     class="streamtape-frame"></iframe>`;
@@ -1181,18 +1178,6 @@ function setupStreamtapeFullscreen() {
   
   if (!iframe.src || !iframe.src.includes('streamtape')) return;
   
-  window.addEventListener('message', function(event) {
-    if (event.data && typeof event.data === 'string') {
-      if (event.data.includes('fullscreen') || event.data.includes('requestFullscreen')) {
-        const playerScreen = document.querySelector('.player-screen');
-        if (playerScreen) {
-          toggleFullscreen(playerScreen);
-        }
-      }
-    }
-  });
-  
-  
   iframe.addEventListener('dblclick', function(e) {
     e.preventDefault();
     const playerScreen = document.querySelector('.player-screen');
@@ -1201,9 +1186,9 @@ function setupStreamtapeFullscreen() {
     }
   });
 }
+  
 
 function addFullscreenButton() {
- 
   setTimeout(() => {
     const playerScreen = document.querySelector('.player-screen');
     if (!playerScreen || playerScreen.querySelector('.fullscreen-btn')) return;
@@ -1211,10 +1196,9 @@ function addFullscreenButton() {
     const iframe = playerScreen.querySelector('iframe');
     if (!iframe) return;
     
-    const isStreamtape = (iframe.src && (iframe.src.includes('streamtape') || iframe.id === 'stape-frame')) ||
-                         (iframe.getAttribute('data-source') === 'streamtape');
+    // Verificar si es Streamtape
+    const isStreamtape = (iframe.src && iframe.src.includes('streamtape')) || iframe.id === 'stape-frame';
     
-
     if (!isStreamtape) return;
     
     const btn = document.createElement('div');
@@ -1222,7 +1206,7 @@ function addFullscreenButton() {
     btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
     </svg>`;
-    btn.title = 'Pantalla completa (F) - Presiona ESC para salir';
+    btn.title = 'Pantalla completa (F)';
     
     function updateButtonIcon() {
       const isFullscreen = document.fullscreenElement || 
@@ -1232,12 +1216,12 @@ function addFullscreenButton() {
         btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/>
         </svg>`;
-        btn.title = 'Salir de pantalla completa (ESC)';
+        btn.title = 'Salir (ESC)';
       } else {
         btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
         </svg>`;
-        btn.title = 'Pantalla completa (F) - Presiona ESC para salir';
+        btn.title = 'Pantalla completa (F)';
       }
     }
     
