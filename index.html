@@ -661,7 +661,7 @@ img{max-width:100%;display:block}
   max-width: none !important;
 }
 
-/* Botón de pantalla completo personalizado (opcional) */
+/* Botón de pantalla completo - oculto por defecto */
 .fullscreen-btn {
   position: absolute;
   bottom: 70px;
@@ -689,51 +689,62 @@ img{max-width:100%;display:block}
   border-color: var(--accent);
 }
 
-/* En pantalla completa, el botón permanece visible (opcional) */
-.fullscreen-btn:fullscreen,
-.fullscreen-btn:-webkit-full-screen,
-.fullscreen-btn:-moz-full-screen {
-  opacity: 1 !important;
+/* Cuando está en pantalla completa, el botón se muestra más pequeño y discreto */
+.player-screen:-webkit-full-screen .fullscreen-btn,
+.player-screen:fullscreen .fullscreen-btn,
+.player-screen:-moz-full-screen .fullscreen-btn {
+  opacity: 0.6 !important;
   visibility: visible !important;
-}
-
-/* Mejorar experiencia de pantalla completa */
-.player-screen iframe:-webkit-full-screen {
-  width: 100% !important;
-  height: 100% !important;
-  max-width: none !important;
-}
-
-.player-screen iframe:fullscreen {
-  width: 100% !important;
-  height: 100% !important;
-  max-width: none !important;
-}
-
-/* Botón de pantalla completo personalizado */
-.fullscreen-btn {
-  position: absolute;
-  bottom: 70px;
+  width: 36px;
+  height: 36px;
+  bottom: 80px;
   right: 20px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: rgba(0,0,0,0.7);
-  border: 1px solid rgba(255,255,255,0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 10;
-  transition: all 0.2s;
-  color: white;
-  backdrop-filter: blur(4px);
 }
 
-.fullscreen-btn:hover {
+.player-screen:-webkit-full-screen .fullscreen-btn:hover,
+.player-screen:fullscreen .fullscreen-btn:hover,
+.player-screen:-moz-full-screen .fullscreen-btn:hover {
+  opacity: 1 !important;
   background: var(--accent);
-  transform: scale(1.05);
-  border-color: var(--accent);
+}
+
+/* Tamaños específicos para móvil en pantalla completa */
+@media (max-width: 768px) {
+  .fullscreen-btn {
+    width: 48px;
+    height: 48px;
+    bottom: 60px;
+    right: 15px;
+  }
+  
+  .fullscreen-btn svg {
+    width: 22px;
+    height: 22px;
+  }
+  
+  /* En pantalla completa en móvil, más pequeño y semi-transparente */
+  .player-screen:-webkit-full-screen .fullscreen-btn,
+  .player-screen:fullscreen .fullscreen-btn {
+    width: 44px;
+    height: 44px;
+    bottom: 70px;
+    right: 15px;
+    opacity: 0.5 !important;
+    background: rgba(0,0,0,0.5);
+  }
+  
+  .player-screen:-webkit-full-screen .fullscreen-btn svg,
+  .player-screen:fullscreen .fullscreen-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .player-screen:-webkit-full-screen .fullscreen-btn:active,
+  .player-screen:fullscreen .fullscreen-btn:active {
+    opacity: 1 !important;
+    background: var(--accent);
+    transform: scale(0.95);
+  }
 }
 
 /* Botón de volver mejorado */
@@ -1208,9 +1219,7 @@ function addFullscreenButton() {
     const iframe = playerScreen.querySelector('iframe');
     if (!iframe) return;
     
- 
     const isStreamtape = (iframe.src && iframe.src.includes('streamtape')) || iframe.id === 'stape-frame';
-    
     if (!isStreamtape) return;
     
     const btn = document.createElement('div');
@@ -1220,10 +1229,9 @@ function addFullscreenButton() {
     </svg>`;
     btn.title = 'Pantalla completa (F)';
     
-
     btn.style.opacity = '0';
     btn.style.visibility = 'hidden';
-    btn.style.transition = 'opacity 0.2s ease, visibility 0.2s ease';
+    btn.style.transition = 'opacity 0.2s ease, visibility 0.2s ease, transform 0.15s ease';
     
     function updateButtonIcon() {
       const isFullscreen = document.fullscreenElement || 
@@ -1234,11 +1242,20 @@ function addFullscreenButton() {
           <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/>
         </svg>`;
         btn.title = 'Salir (ESC)';
+        // En pantalla completa, aseguramos que sea visible
+        btn.style.opacity = '0.6';
+        btn.style.visibility = 'visible';
       } else {
         btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
         </svg>`;
         btn.title = 'Pantalla completa (F)';
+        // Fuera de pantalla completa, ocultar si no hay hover
+        const isHovering = playerScreen.matches(':hover');
+        if (!isHovering && !btn._touchActive) {
+          btn.style.opacity = '0';
+          btn.style.visibility = 'hidden';
+        }
       }
     }
     
@@ -1248,23 +1265,37 @@ function addFullscreenButton() {
       setTimeout(updateButtonIcon, 100);
     };
     
+    // Para móvil: feedback táctil
+    btn.addEventListener('touchstart', (e) => {
+      e.stopPropagation();
+      btn.style.transform = 'scale(0.95)';
+    });
+    
+    btn.addEventListener('touchend', (e) => {
+      e.stopPropagation();
+      btn.style.transform = 'scale(1)';
+    });
+    
     playerScreen.style.position = 'relative';
     playerScreen.appendChild(btn);
     
     let hoverTimer;
     let touchTimer;
     
-
+    // PC: hover
     playerScreen.addEventListener('mouseenter', () => {
       clearTimeout(hoverTimer);
-      btn.style.opacity = '1';
-      btn.style.visibility = 'visible';
+      const isFullscreen = document.fullscreenElement || 
+                          document.webkitFullscreenElement || 
+                          document.mozFullScreenElement;
+      if (!isFullscreen) {
+        btn.style.opacity = '1';
+        btn.style.visibility = 'visible';
+      }
     });
     
     playerScreen.addEventListener('mouseleave', () => {
-
       hoverTimer = setTimeout(() => {
-
         const isFullscreen = document.fullscreenElement || 
                             document.webkitFullscreenElement || 
                             document.mozFullScreenElement;
@@ -1275,23 +1306,26 @@ function addFullscreenButton() {
       }, 300);
     });
     
-
+    // Móvil: toque
     playerScreen.addEventListener('touchstart', (e) => {
       e.preventDefault();
-      btn.style.opacity = '1';
-      btn.style.visibility = 'visible';
-      
-      if (touchTimer) clearTimeout(touchTimer);
-      
-      touchTimer = setTimeout(() => {
-        const isFullscreen = document.fullscreenElement || 
-                            document.webkitFullscreenElement || 
-                            document.mozFullScreenElement;
-        if (!isFullscreen) {
-          btn.style.opacity = '0';
-          btn.style.visibility = 'hidden';
-        }
-      }, 2500);
+      const isFullscreen = document.fullscreenElement || 
+                          document.webkitFullscreenElement || 
+                          document.mozFullScreenElement;
+      if (!isFullscreen) {
+        btn._touchActive = true;
+        btn.style.opacity = '1';
+        btn.style.visibility = 'visible';
+        
+        if (touchTimer) clearTimeout(touchTimer);
+        touchTimer = setTimeout(() => {
+          btn._touchActive = false;
+          if (!isFullscreen) {
+            btn.style.opacity = '0';
+            btn.style.visibility = 'hidden';
+          }
+        }, 3000);
+      }
     });
     
     btn.addEventListener('touchstart', (e) => {
@@ -1301,17 +1335,17 @@ function addFullscreenButton() {
     
     btn.addEventListener('touchend', (e) => {
       e.stopPropagation();
-   
       if (touchTimer) clearTimeout(touchTimer);
-      touchTimer = setTimeout(() => {
-        const isFullscreen = document.fullscreenElement || 
-                            document.webkitFullscreenElement || 
-                            document.mozFullScreenElement;
-        if (!isFullscreen) {
+      const isFullscreen = document.fullscreenElement || 
+                          document.webkitFullscreenElement || 
+                          document.mozFullScreenElement;
+      if (!isFullscreen) {
+        touchTimer = setTimeout(() => {
+          btn._touchActive = false;
           btn.style.opacity = '0';
           btn.style.visibility = 'hidden';
-        }
-      }, 2500);
+        }, 3000);
+      }
     });
     
     document.addEventListener('fullscreenchange', updateButtonIcon);
