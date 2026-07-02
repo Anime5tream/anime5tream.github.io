@@ -8,9 +8,22 @@
 const API='https://jimov-api.vercel.app';
 const GENRES=['accion','artes-marciales','aventura','carreras','ciencia-ficcion','comedia','demencia','demonios','deportes','drama','ecchi','escolares','espacial','fantasia','harem','historico','infantil','josei','juegos','magia','mecha','militar','misterio','musica','parodia','policia','psicologico','recuentos-de-la-vida','romance','samurai','seinen','shoujo','shounen','sobrenatural','superpoderes','suspenso','terror','vampiros','yaoi','yuri'];
 
-async function req(path){
-  try{const r=await fetch(API+path);if(!r.ok)return null;return await r.json();}
-  catch{return null;}
+async function req(path,retries){
+  retries=retries===undefined?2:retries;
+  for(let attempt=0;attempt<=retries;attempt++){
+    try{
+      const ctrl=new AbortController();
+      const t=setTimeout(()=>ctrl.abort(),15000);
+      const r=await fetch(API+path,{signal:ctrl.signal});
+      clearTimeout(t);
+      if(!r.ok){if(attempt<retries){await new Promise(res=>setTimeout(res,900));continue}return null}
+      return await r.json();
+    }catch{
+      if(attempt<retries){await new Promise(res=>setTimeout(res,900));continue}
+      return null;
+    }
+  }
+  return null;
 }
 function slugFromUrl(url){if(!url)return'';const parts=url.split('/');return parts[parts.length-1]}
 function animeSlugFromEpisodeUrl(url){return slugFromUrl(url).replace(/-\d+$/,'')}
@@ -65,7 +78,7 @@ function safeStr(s){return(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").repl
 /* TioAnime bloquea hotlinking por Referer -> las <img> cross-origin devuelven 403.
    Se proxyea via wsrv.nl (fetch server-side, sin Referer del navegador). */
 function proxyImg(url){if(!url)return'';if(!/^https?:\/\//i.test(url))return url;return'https://wsrv.nl/?url='+encodeURIComponent(url.replace(/^https?:\/\//i,''))}
-function mkImg(url,cls,alt){const p=proxyImg(url);if(!p)return'<div class="'+cls+' img-ph"></div>';return'<img src="'+p+'" class="'+cls+'" alt="'+(alt||'')+'" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement(\'div\'),{className:this.className+\' img-ph\'}))">'}
+function mkImg(url,cls,alt){const p=proxyImg(url);if(!p)return'<div class="'+cls+' img-ph"></div>';return'<img src="'+p+'" class="'+cls+'" alt="'+(alt||'')+'" loading="lazy" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement(\'div\'),{className:this.className+\' img-ph\'}))">'}
 function typeLabel(t){if(!t||t==='Null')return null;return t}
 function typeBadge(type){const l=typeLabel(type);if(!l)return'';return'<div class="ac-type">'+l.toUpperCase()+'</div>'}
 function favSvg(on){return'<svg width="12" height="12" viewBox="0 0 24 24" fill="'+(on?'var(--accent2)':'none')+'" stroke="'+(on?'var(--accent2)':'currentColor')+'" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>'}

@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>En emision · AnimeStream</title>
 <meta name="description" content="Una pagina para ver anime sin anuncios :D">
@@ -74,7 +75,7 @@ async function loadOnAir(){
   grid.innerHTML='<div class="load" style="grid-column:1/-1"><div class="spin"></div></div>';
   const d=await req('/anime/tioanime/filter?status=1&sort=recent');
   const items=(d&&Array.isArray(d.results))?d.results:[];
-  if(!items.length){grid.innerHTML='<div style="color:var(--text3);font-size:13px;grid-column:1/-1;padding:20px 0">No se pudo cargar.</div>';return;}
+  if(!items.length){grid.innerHTML='<div style="color:var(--text3);font-size:13px;grid-column:1/-1;padding:20px 0;text-align:center">No se pudo cargar. La API puede tardar en responder.<br><button class="btn btn-secondary btn-sm" style="margin-top:10px" onclick="loadOnAir()">Reintentar</button></div>';return;}
   grid.innerHTML=items.map(a=>animeCard(a)).join('');
 }
 loadOnAir();
