@@ -104,7 +104,6 @@ function setHero(i){
   const animeSlug=isEp?animeSlugFromEpisodeUrl(a.url):slug;
   body.innerHTML=(isEp?'<div class="hero-ep-badge">'+playSvg(12)+' Episodio '+a.num+'</div>':'')+
     '<div class="hero-title">'+(a.name||'Sin titulo')+'</div>'+
-    '<div class="hero-syn">'+(a.synopsis||'Haz clic para ver los detalles de este anime.')+'</div>'+
     '<div class="hero-acts">'+(isEp?'<a class="btn btn-primary" href="player.html?slug='+encodeURIComponent(animeSlug)+'&num='+a.num+'">'+playSvg(13)+' Ver ahora</a>':'')+
     '<a class="btn btn-secondary" href="'+detailLink(animeSlug)+'">Ver anime</a></div>';
 }
