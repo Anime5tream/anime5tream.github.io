@@ -1,90 +1,146 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8">
-<meta name="referrer" content="no-referrer">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Favoritos · AnimeStream</title>
-<meta name="description" content="Una pagina para ver anime sin anuncios :D">
-<meta property="og:title" content="AnimeStream">
-<meta property="og:description" content="Una pagina para ver anime sin anuncios :D">
-<meta property="og:image" content="https://i.imgur.com/ZkZavVo.png">
-<meta property="og:url" content="https://anime5tream.github.io/favorites.html">
-<meta property="og:type" content="website">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="AnimeStream">
-<meta name="twitter:description" content="Una pagina para ver anime sin anuncios :D">
-<meta name="twitter:image" content="https://i.imgur.com/ZkZavVo.png">
-<link rel="icon" type="image/png" href="https://i.imgur.com/ZkZavVo.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Favoritos · AnimeStream</title>
+  <meta name="description" content="Una pagina para ver anime sin anuncios :D">
+  <meta property="og:title" content="AnimeStream">
+  <meta property="og:description" content="Una pagina para ver anime sin anuncios :D">
+  <meta property="og:image" content="https://i.imgur.com/ZkZavVo.png">
+  <meta property="og:url" content="https://anime5tream.github.io/favorites.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AnimeStream">
+  <meta name="twitter:description" content="Una pagina para ver anime sin anuncios :D">
+  <meta name="twitter:image" content="https://i.imgur.com/ZkZavVo.png">
+  <link rel="icon" type="image/png" href="https://i.imgur.com/ZkZavVo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 
 </head>
+
 <body>
-<div id="app">
-<aside id="sidebar">
-  <a class="s-logo" href="index.html">
-    <div class="s-logo-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polygon points="5,3 19,12 5,21"/></svg></div>
-    <div class="s-logo-text">Anime<span>Stream</span></div>
-  </a>
-  <nav class="s-nav">
-    <div class="s-section">Principal</div>
-    <a class="s-item" href="index.html"><svg class="s-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Inicio</a>
-<a class="s-item" href="explore.html"><svg class="s-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Explorar</a>
-<a class="s-item" href="onair.html"><svg class="s-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M6.34 6.34a8 8 0 000 11.32M17.66 6.34a8 8 0 010 11.32M3.76 3.76a12 12 0 000 16.48M20.24 3.76a12 12 0 010 16.48"/></svg>En emision</a>
-<a class="s-item active" href="favorites.html"><svg class="s-icon" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>Favoritos</a>
-<a class="s-item" href="history.html"><svg class="s-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>Historial</a>
-
-  </nav>
-  <div class="s-bottom">API: jimov-api / TioAnime</div>
-</aside>
-<div id="sb-ov"></div>
-
-<main id="main">
-  <header id="topbar">
-    <button class="menu-btn" onclick="toggleSb()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-    </button>
-    <div class="search-wrap">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input id="search-input" type="text" placeholder="Buscar anime..." autocomplete="off">
-      <div class="search-drop" id="sdrop"></div>
-    </div>
-    <div class="t-right">
-      <a class="t-btn" href="favorites.html" title="Favoritos">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+  <div id="app">
+    <aside id="sidebar">
+      <a class="s-logo" href="index.html">
+        <div class="s-logo-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white"
+            stroke-width="2">
+            <polygon points="5,3 19,12 5,21" />
+          </svg></div>
+        <div class="s-logo-text">Anime<span>Stream</span></div>
       </a>
-    </div>
-  </header>
+      <nav class="s-nav">
+        <div class="s-section">Principal</div>
+        <a class="s-item" href="index.html"><svg class="s-icon" viewBox="0 0 24 24">
+            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+            <polyline points="9,22 9,12 15,12 15,22" />
+          </svg>Inicio</a>
+        <a class="s-item" href="explore.html"><svg class="s-icon" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>Explorar</a>
+        <a class="s-item" href="onair.html"><svg class="s-icon" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="2" />
+            <path
+              d="M6.34 6.34a8 8 0 000 11.32M17.66 6.34a8 8 0 010 11.32M3.76 3.76a12 12 0 000 16.48M20.24 3.76a12 12 0 010 16.48" />
+          </svg>En emision</a>
+        <a class="s-item active" href="favorites.html"><svg class="s-icon" viewBox="0 0 24 24">
+            <path
+              d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
+          </svg>Favoritos</a>
+        <a class="s-item" href="history.html"><svg class="s-icon" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12,6 12,12 16,14" />
+          </svg>Historial</a>
 
-  <div class="page">
-    <div class="sec-head"><div><div class="sec-title">Favoritos</div><div class="sec-sub" id="fav-sub">0 animes guardados</div></div></div>
-    <div id="fav-body"></div>
 
+        <a class="s-item" href="profile.html"><svg class="s-icon" viewBox="0 0 24 24">
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 21v-1a8 8 0 0116 0v1" />
+          </svg>Perfil</a>
+      </nav>
+      <div class="s-bottom">
+        <a class="s-profile" href="profile.html">
+          <div class="s-ava" id="sb-ava"><span id="sb-ini">?</span></div>
+          <div>
+            <div class="s-pname" id="sb-uname">Mi perfil</div>
+            <div class="s-prole" id="sb-role">Recien llegado</div>
+          </div>
+        </a>
+      </div>
+    </aside>
+    <div id="sb-ov"></div>
+
+    <main id="main">
+      <header id="topbar">
+        <button class="menu-btn" onclick="toggleSb()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+        <div class="search-wrap">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <input id="search-input" type="text" placeholder="Buscar anime..." autocomplete="off">
+          <div class="search-drop" id="sdrop"></div>
+        </div>
+        <div class="t-right">
+          <a class="t-btn" href="favorites.html" title="Favoritos">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path
+                d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
+            </svg>
+          </a>
+          <a class="t-btn-avatar" id="topbar-avatar" href="profile.html"><span id="topbar-ini">?</span></a>
+        </div>
+      </header>
+
+      <div class="page">
+        <div class="sec-head">
+          <div>
+            <div class="sec-title">Favoritos</div>
+            <div class="sec-sub" id="fav-sub">0 animes guardados</div>
+          </div>
+        </div>
+        <div id="fav-body"></div>
+
+      </div>
+    </main>
   </div>
-</main>
-</div>
-<div class="toast-box" id="toast-box"></div>
+  <div class="toast-box" id="toast-box"></div>
 
-<script src="common.js"></script>
-<script>
-function onFavToggled(){loadFavs();}
-function loadFavs(){
-  const items=Object.values(S.favs);
-  document.getElementById('fav-sub').textContent=items.length+' anime'+(items.length!==1?'s':'')+' guardado'+(items.length!==1?'s':'');
-  const body=document.getElementById('fav-body');
-  if(!items.length){body.innerHTML='<div class="fav-empty"><svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg><h3>Sin favoritos aun</h3><p>Explora y guarda los animes que te gusten.</p><a class="btn btn-primary" style="margin-top:14px" href="explore.html">Explorar animes</a></div>';return;}
-  body.innerHTML='<div class="anime-grid">'+items.map(a=>{
-    return'<a class="ac" href="'+detailLink(a.slug)+'">'+mkImg(a.cover,'ac-poster',a.title)+
-      '<button class="fav-pin on" data-slug="'+a.slug+'" onclick="toggleFav(\''+a.slug+'\',\''+safeStr(a.title)+'\',\''+safeStr(a.cover)+'\',event)">'+favSvg(true)+'</button>'+
-      '<div class="ac-body"><div class="ac-title">'+(a.title||'Sin titulo')+'</div>'+
-      '<div class="ac-meta" style="font-size:10px">'+(a.addedAt?new Date(a.addedAt).toLocaleDateString('es-ES',{day:'2-digit',month:'short'}):'')+'</div></div></a>';
-  }).join('')+'</div>';
-}
-loadFavs();
-</script>
+  <script src="common.js"></script>
+  <script>
+    function onFavToggled() { loadFavs(); }
+    function loadFavs() {
+      const items = Object.values(S.favs);
+      document.getElementById('fav-sub').textContent = items.length + ' anime' + (items.length !== 1 ? 's' : '') + ' guardado' + (items.length !== 1 ? 's' : '');
+      const body = document.getElementById('fav-body');
+      if (!items.length) { body.innerHTML = '<div class="fav-empty"><svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg><h3>Sin favoritos aun</h3><p>Explora y guarda los animes que te gusten.</p><a class="btn btn-primary" style="margin-top:14px" href="explore.html">Explorar animes</a></div>'; return; }
+      const clearBtn = '<div class="hist-actions"><button class="btn btn-secondary btn-sm" onclick="clearAllFavs()" style="background:rgba(255,82,82,.1);border-color:rgba(255,82,82,.3);color:var(--red)">Eliminar todos</button></div>';
+      body.innerHTML = clearBtn + '<div class="anime-grid">' + items.map(a => {
+        return '<a class="ac" href="' + detailLink(a.slug) + '">' + posterBlock(a.cover, a.title, a.slug, null) +
+          '<div class="ac-body"><div class="ac-title">' + (a.title || 'Sin titulo') + '</div>' +
+          '<div class="ac-meta" style="font-size:10px">' + (a.addedAt ? new Date(a.addedAt).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }) : '') + '</div></div></a>';
+      }).join('') + '</div>';
+    }
+    function clearAllFavs() {
+      if (!Object.keys(S.favs).length) return;
+      if (confirm('Eliminar todos los favoritos?')) { S.favs = {}; persist(); toast('Favoritos eliminados', 'ok'); loadFavs(); }
+    }
+    loadFavs();
+  </script>
 
 </body>
+
 </html>

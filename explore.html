@@ -20,7 +20,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
-
 </head>
 <body>
 <div id="app">
@@ -36,9 +35,15 @@
 <a class="s-item" href="onair.html"><svg class="s-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M6.34 6.34a8 8 0 000 11.32M17.66 6.34a8 8 0 010 11.32M3.76 3.76a12 12 0 000 16.48M20.24 3.76a12 12 0 010 16.48"/></svg>En emision</a>
 <a class="s-item" href="favorites.html"><svg class="s-icon" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>Favoritos</a>
 <a class="s-item" href="history.html"><svg class="s-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>Historial</a>
-
+  
+<a class="s-item" href="profile.html"><svg class="s-icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0116 0v1"/></svg>Perfil</a>
   </nav>
-  <div class="s-bottom">API: jimov-api / TioAnime</div>
+  <div class="s-bottom">
+    <a class="s-profile" href="profile.html">
+      <div class="s-ava" id="sb-ava"><span id="sb-ini">?</span></div>
+      <div><div class="s-pname" id="sb-uname">Mi perfil</div><div class="s-prole" id="sb-role">Recien llegado</div></div>
+    </a>
+  </div>
 </aside>
 <div id="sb-ov"></div>
 
@@ -47,15 +52,12 @@
     <button class="menu-btn" onclick="toggleSb()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
     </button>
-    <div class="search-wrap">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input id="search-input" type="text" placeholder="Buscar anime..." autocomplete="off">
-      <div class="search-drop" id="sdrop"></div>
-    </div>
+    <div style="flex:1"></div>
     <div class="t-right">
       <a class="t-btn" href="favorites.html" title="Favoritos">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
-      </a>
+            </a>
+      <a class="t-btn-avatar" id="topbar-avatar" href="profile.html"><span id="topbar-ini">?</span></a>
     </div>
   </header>
 
@@ -69,19 +71,18 @@
     <div class="fbar">
       <select class="fsel" id="f-type" onchange="loadExplore()">
         <option value="">Todos los tipos</option>
-        <option value="0">TV</option><option value="1">Pelicula</option><option value="2">OVA</option><option value="3">Especial</option>
+        <option value="0">TV</option>
+        <option value="1">Pelicula</option>
+        <option value="2">OVA</option>
+        <option value="3">ONA</option>
       </select>
       <select class="fsel" id="f-status" onchange="loadExplore()">
         <option value="">Cualquier estado</option>
-        <option value="1">En emision</option><option value="2">Finalizado</option><option value="3">Proximamente</option>
-      </select>
-      <select class="fsel" id="f-sort" onchange="loadExplore()">
-        <option value="">Orden por defecto</option>
-        <option value="recent">Mas recientes</option><option value="-recent">Mas antiguos</option>
+        <option value="1">En emision</option>
+        <option value="2">Finalizado</option>
       </select>
     </div>
-    <div class="anime-grid" id="explore-grid"><div class="load" style="grid-column:1/-1"><div class="spin"></div></div></div>
-
+    <div id="explore-grid"><div class="load" style="grid-column:1/-1"><div class="spin"></div></div></div>
   </div>
 </main>
 </div>
@@ -89,36 +90,157 @@
 
 <script src="common.js"></script>
 <script>
-let exploreQuery='',exploreGenre='',expSearchTimer=null;
+let exploreQuery='',exploreGenre='',expSearchTimer=null,exploreItems=[],explorePage=0;
 
+function stableHue(str){let h=0;for(let i=0;i<str.length;i++)h=(h*31+str.charCodeAt(i))>>>0;return h%360}
 function buildGenreChips(){
   const row=document.getElementById('genre-row');
+  const validGenres = ['accion','aventura','ciencia-ficcion','comedia','demonios','drama','ecchi','fantasia','harem','historico','magia','mecha','misterio','musica','psicologico','romance','samurai','seinen','shoujo','shounen','sobrenatural','suspenso','terror'];
   row.innerHTML='<span class="fchip on" onclick="setGenre(this,\'\')">Todos</span>'+
-    GENRES.map(g=>'<span class="fchip" onclick="setGenre(this,\''+g+'\')">'+g.replace(/-/g,' ')+'</span>').join('');
+    validGenres.map(g=>'<span class="fchip" style="--h:'+stableHue(g)+'" onclick="setGenre(this,\''+g+'\')"><span class="fdot"></span>'+g.replace(/-/g,' ')+'</span>').join('');
 }
 function setGenre(el,g){document.querySelectorAll('#genre-row .fchip').forEach(c=>c.classList.remove('on'));el.classList.add('on');exploreGenre=g;loadExplore();}
-async function loadExplore(){
-  const grid=document.getElementById('explore-grid');
-  grid.innerHTML='<div class="load" style="grid-column:1/-1"><div class="spin"></div></div>';
-  const qp=new URLSearchParams();
-  if(exploreQuery.trim())qp.set('title',exploreQuery.trim());
-  if(exploreGenre)qp.append('gen[]',exploreGenre);
-  const type=document.getElementById('f-type').value,status=document.getElementById('f-status').value,sort=document.getElementById('f-sort').value;
-  if(type!=='')qp.set('type',type);
-  if(status!=='')qp.set('status',status);
-  if(sort)qp.set('sort',sort);
-  const d=await req('/anime/tioanime/filter?'+qp.toString());
-  const items=(d&&Array.isArray(d.results))?d.results:[];
-  document.getElementById('exp-sub').textContent=items.length+' resultados';
-  if(!items.length){grid.innerHTML='<div style="color:var(--text3);font-size:13px;grid-column:1/-1;padding:20px 0">Sin resultados.</div>';return;}
-  grid.innerHTML=items.slice(0,40).map(a=>animeCard(a)).join('');
+
+function idleState(){
+  return'<div class="fav-empty" style="grid-column:1/-1"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><h3>Busca un anime para empezar</h3><p>O elegi una categoria o filtro arriba.</p></div>';
 }
+
+async function loadExplore(){
+  const grid=document.getElementById('explore-grid'),sub=document.getElementById('exp-sub');
+  const q=exploreQuery.trim();
+  const typeValue = document.getElementById('f-type').value;
+  const statusValue = document.getElementById('f-status').value;
+  
+  const type = typeValue ? parseInt(typeValue) : null;
+  const status = statusValue ? parseInt(statusValue) : null;
+
+  if(!q && !exploreGenre && type === null && status === null){
+    grid.innerHTML=idleState();
+    sub.textContent='Busca por nombre o filtra por genero';
+    return;
+  }
+
+  grid.innerHTML='<div class="load" style="grid-column:1/-1"><div class="spin"></div></div>';
+
+  let items = [];
+
+  if(q){
+    const searchQuery = q.replace(/[:;]/g, ' ').replace(/\s+/g, ' ').trim();
+    let url = '/anime/tioanime/filter?title=' + encodeURIComponent(searchQuery);
+    
+    if(exploreGenre){
+      url += '&gen%5B%5D=' + encodeURIComponent(exploreGenre);
+    }
+    if(type !== null){
+      url += '&type=' + type;
+    }
+    if(status !== null){
+      url += '&status=' + status;
+    }
+    
+    const d = await req(url);
+    items = (d && Array.isArray(d.results)) ? d.results : [];
+    
+    if (items.length === 0 && q !== searchQuery) {
+      const fallbackQuery = q.replace(/[^a-zA-Z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+      if (fallbackQuery !== searchQuery) {
+        let fallbackUrl = '/anime/tioanime/filter?title=' + encodeURIComponent(fallbackQuery);
+        if(exploreGenre){
+          fallbackUrl += '&gen%5B%5D=' + encodeURIComponent(exploreGenre);
+        }
+        if(type !== null){
+          fallbackUrl += '&type=' + type;
+        }
+        if(status !== null){
+          fallbackUrl += '&status=' + status;
+        }
+        const d2 = await req(fallbackUrl);
+        items = (d2 && Array.isArray(d2.results)) ? d2.results : [];
+      }
+    }
+    
+    if (items.length > 0) {
+      items = items.filter(a => matchesQuery(a.name, q));
+    }
+  } else {
+    let url = '/anime/tioanime/filter';
+    let params = [];
+    
+    if(exploreGenre){
+      params.push('gen%5B%5D=' + encodeURIComponent(exploreGenre));
+    }
+    if(type !== null){
+      params.push('type=' + type);
+    }
+    if(status !== null){
+      params.push('status=' + status);
+    }
+    
+    if(params.length > 0){
+      url += '?' + params.join('&');
+      const d = await req(url);
+      items = (d && Array.isArray(d.results)) ? d.results : [];
+    } else {
+      const pool = await getCatalogPool();
+      items = pool ? pool.slice() : [];
+    }
+  }
+
+  sub.textContent = items.length + ' resultados';
+  
+  if(!items.length){
+    grid.innerHTML='<div style="color:var(--text3);font-size:13px;grid-column:1/-1;padding:20px 0">Sin resultados.</div>';
+    return;
+  }
+
+  exploreItems = items;
+  explorePage = 0;
+  renderExplorePage();
+}
+
+const EXP_PAGE_SIZE = 24;
+function renderExplorePage(){
+  const grid=document.getElementById('explore-grid'),sub=document.getElementById('exp-sub');
+  const total=exploreItems.length;
+  const totalPages=Math.max(1,Math.ceil(total/EXP_PAGE_SIZE));
+  explorePage=Math.min(Math.max(0,explorePage),totalPages-1);
+  sub.textContent=total+' resultados'+(totalPages>1?' · pagina '+(explorePage+1)+' de '+totalPages:'');
+
+  const slice=exploreItems.slice(explorePage*EXP_PAGE_SIZE,(explorePage+1)*EXP_PAGE_SIZE);
+  const cardsHtml=slice.map(a => {
+    const slug = slugFromUrl(a.url);
+    const name = a.name || 'Sin titulo';
+    const imgUrl = (a.image && a.image.url) || a.image || '';
+    const typeStr = a.type ? typeLabel(a.type) : '';
+
+    return '<a class="ac" href="' + detailLink(slug) + '">' +
+      posterBlock(imgUrl, name, slug, a.type) +
+      '<div class="ac-body"><div class="ac-title">' + name + '</div><div class="ac-meta">' + (typeStr || '') + '</div></div></a>';
+  }).join('');
+
+  grid.innerHTML = '<div class="anime-grid">'+cardsHtml+'</div>' + buildPager(totalPages);
+}
+
+function buildPager(totalPages){
+  if(totalPages<=1)return'';
+  const cur=explorePage;
+  const btn=(p,label,disabled,active)=>'<button class="pg-btn'+(active?' on':'')+'" '+(disabled?'disabled':'onclick="goExplorePage('+p+')"')+'>'+label+'</button>';
+  let nums='';
+  const start=Math.max(0,Math.min(cur-2,totalPages-5)),end=Math.min(totalPages,start+5);
+  for(let p=Math.max(0,start);p<end;p++)nums+=btn(p,p+1,false,p===cur);
+  return '<div class="pager">'+
+    btn(cur-1,'Anterior',cur===0)+
+    nums+
+    btn(cur+1,'Siguiente',cur>=totalPages-1)+
+    '</div>';
+}
+function goExplorePage(p){explorePage=p;renderExplorePage();window.scrollTo({top:document.querySelector('.page').offsetTop,behavior:'smooth'});}
+
 document.getElementById('exp-search-input').addEventListener('input',function(){
-  clearTimeout(expSearchTimer);exploreQuery=this.value;expSearchTimer=setTimeout(()=>loadExplore(),420);
+  clearTimeout(expSearchTimer);exploreQuery=this.value;expSearchTimer=setTimeout(()=>loadExplore(),300);
 });
 buildGenreChips();
 loadExplore();
 </script>
-
 </body>
 </html>

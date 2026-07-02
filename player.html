@@ -1,121 +1,172 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8">
-<meta name="referrer" content="no-referrer">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Reproductor · AnimeStream</title>
-<meta name="description" content="Una pagina para ver anime sin anuncios :D">
-<meta property="og:title" content="AnimeStream">
-<meta property="og:description" content="Una pagina para ver anime sin anuncios :D">
-<meta property="og:image" content="https://i.imgur.com/ZkZavVo.png">
-<meta property="og:url" content="https://anime5tream.github.io/player.html">
-<meta property="og:type" content="website">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="AnimeStream">
-<meta name="twitter:description" content="Una pagina para ver anime sin anuncios :D">
-<meta name="twitter:image" content="https://i.imgur.com/ZkZavVo.png">
-<link rel="icon" type="image/png" href="https://i.imgur.com/ZkZavVo.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reproductor · AnimeStream</title>
+  <meta name="description" content="Una pagina para ver anime sin anuncios :D">
+  <meta property="og:title" content="AnimeStream">
+  <meta property="og:description" content="Una pagina para ver anime sin anuncios :D">
+  <meta property="og:image" content="https://i.imgur.com/ZkZavVo.png">
+  <meta property="og:url" content="https://anime5tream.github.io/player.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AnimeStream">
+  <meta name="twitter:description" content="Una pagina para ver anime sin anuncios :D">
+  <meta name="twitter:image" content="https://i.imgur.com/ZkZavVo.png">
+  <link rel="icon" type="image/png" href="https://i.imgur.com/ZkZavVo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 
 </head>
+
 <body>
-<div id="app">
-<aside id="sidebar">
-  <a class="s-logo" href="index.html">
-    <div class="s-logo-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polygon points="5,3 19,12 5,21"/></svg></div>
-    <div class="s-logo-text">Anime<span>Stream</span></div>
-  </a>
-  <nav class="s-nav">
-    <div class="s-section">Principal</div>
-    <a class="s-item" href="index.html"><svg class="s-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Inicio</a>
-<a class="s-item" href="explore.html"><svg class="s-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Explorar</a>
-<a class="s-item" href="onair.html"><svg class="s-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M6.34 6.34a8 8 0 000 11.32M17.66 6.34a8 8 0 010 11.32M3.76 3.76a12 12 0 000 16.48M20.24 3.76a12 12 0 010 16.48"/></svg>En emision</a>
-<a class="s-item" href="favorites.html"><svg class="s-icon" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>Favoritos</a>
-<a class="s-item" href="history.html"><svg class="s-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>Historial</a>
-
-  </nav>
-  <div class="s-bottom">API: jimov-api / TioAnime</div>
-</aside>
-<div id="sb-ov"></div>
-
-<main id="main">
-  <header id="topbar">
-    <button class="menu-btn" onclick="toggleSb()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-    </button>
-    <div class="search-wrap">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input id="search-input" type="text" placeholder="Buscar anime..." autocomplete="off">
-      <div class="search-drop" id="sdrop"></div>
-    </div>
-    <div class="t-right">
-      <a class="t-btn" href="favorites.html" title="Favoritos">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+  <div id="app">
+    <aside id="sidebar">
+      <a class="s-logo" href="index.html">
+        <div class="s-logo-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white"
+            stroke-width="2">
+            <polygon points="5,3 19,12 5,21" />
+          </svg></div>
+        <div class="s-logo-text">Anime<span>Stream</span></div>
       </a>
-    </div>
-  </header>
+      <nav class="s-nav">
+        <div class="s-section">Principal</div>
+        <a class="s-item" href="index.html"><svg class="s-icon" viewBox="0 0 24 24">
+            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+            <polyline points="9,22 9,12 15,12 15,22" />
+          </svg>Inicio</a>
+        <a class="s-item" href="explore.html"><svg class="s-icon" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>Explorar</a>
+        <a class="s-item" href="onair.html"><svg class="s-icon" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="2" />
+            <path
+              d="M6.34 6.34a8 8 0 000 11.32M17.66 6.34a8 8 0 010 11.32M3.76 3.76a12 12 0 000 16.48M20.24 3.76a12 12 0 010 16.48" />
+          </svg>En emision</a>
+        <a class="s-item" href="favorites.html"><svg class="s-icon" viewBox="0 0 24 24">
+            <path
+              d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
+          </svg>Favoritos</a>
+        <a class="s-item" href="history.html"><svg class="s-icon" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12,6 12,12 16,14" />
+          </svg>Historial</a>
 
-  <div class="page">
-    <div id="play-body"><div class="load"><div class="spin"></div><span>Cargando episodio y servidores...</span></div></div>
 
+        <a class="s-item" href="profile.html"><svg class="s-icon" viewBox="0 0 24 24">
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 21v-1a8 8 0 0116 0v1" />
+          </svg>Perfil</a>
+      </nav>
+      <div class="s-bottom">
+        <a class="s-profile" href="profile.html">
+          <div class="s-ava" id="sb-ava"><span id="sb-ini">?</span></div>
+          <div>
+            <div class="s-pname" id="sb-uname">Mi perfil</div>
+            <div class="s-prole" id="sb-role">Recien llegado</div>
+          </div>
+        </a>
+      </div>
+    </aside>
+    <div id="sb-ov"></div>
+
+    <main id="main">
+      <header id="topbar">
+        <button class="menu-btn" onclick="toggleSb()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+        <div class="search-wrap">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <input id="search-input" type="text" placeholder="Buscar anime..." autocomplete="off">
+          <div class="search-drop" id="sdrop"></div>
+        </div>
+        <div class="t-right">
+          <a class="t-btn" href="favorites.html" title="Favoritos">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path
+                d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
+            </svg>
+          </a>
+          <a class="t-btn-avatar" id="topbar-avatar" href="profile.html"><span id="topbar-ini">?</span></a>
+        </div>
+      </header>
+
+      <div class="page">
+        <div id="play-body">
+          <div class="load">
+            <div class="spin"></div><span>Cargando episodio y servidores...</span>
+          </div>
+        </div>
+
+      </div>
+    </main>
   </div>
-</main>
-</div>
-<div class="toast-box" id="toast-box"></div>
+  <div class="toast-box" id="toast-box"></div>
 
-<script src="common.js"></script>
-<script>
-const qs=new URLSearchParams(location.search);
-const epUrlParam=qs.get('ep');
-const slugParam=qs.get('slug');
-const numParam=parseInt(qs.get('num')||'0',10);
+  <script src="common.js"></script>
+  <script>
+    const qs = new URLSearchParams(location.search);
+    const epUrlParam = qs.get('ep');
+    const slugParam = qs.get('slug');
+    const numParam = parseInt(qs.get('num') || '0', 10);
 
-async function loadPlayer(){
-  const body=document.getElementById('play-body');
-  let epUrl=epUrlParam,animeSlug=slugParam,animeTitle=qs.get('title')||'',coverImg=qs.get('cover')||'',number=numParam;
-  if(!animeSlug&&epUrl)animeSlug=animeSlugFromEpisodeUrl(epUrl);
-  /* Prefer the canonical /anime/tioanime/episode/{slug}-{num} form whenever we
-     have slug+num: some listings (e.g. last/episodes) hand back inconsistent
-     episode urls that resolve to 0 servers, while this canonical form always works. */
-  if(animeSlug&&number)epUrl='/anime/tioanime/episode/'+animeSlug+'-'+number;
-  if(!epUrl){body.innerHTML='<div style="color:var(--text3);padding:40px 0;text-align:center">Episodio no especificado.</div>';return;}
+    async function loadPlayer() {
+      const body = document.getElementById('play-body');
+      let epUrl = epUrlParam, animeSlug = slugParam, animeTitle = qs.get('title') || '', coverImg = qs.get('cover') || '', number = numParam;
+      if (!animeSlug && epUrl) animeSlug = animeSlugFromEpisodeUrl(epUrl);
+      /* Prefer the canonical /anime/tioanime/episode/{slug}-{num} form whenever we
+         have slug+num: some listings (e.g. last/episodes) hand back inconsistent
+         episode urls that resolve to 0 servers, while this canonical form always works. */
+      if (animeSlug && number) epUrl = '/anime/tioanime/episode/' + animeSlug + '-' + number;
+      if (!epUrl) { body.innerHTML = '<div style="color:var(--text3);padding:40px 0;text-align:center">Episodio no especificado.</div>'; return; }
 
-  const [servers,animeData]=await Promise.all([req(epUrl),req('/anime/tioanime/name/'+animeSlug)]);
-  if(animeData){
-    if(!animeTitle)animeTitle=animeData.name;
-    if(!coverImg)coverImg=(animeData.image&&animeData.image.url)||'';
-  }
-  const eps=animeData&&Array.isArray(animeData.episodes)?animeData.episodes.slice().reverse():[];
-  if(!number&&eps.length){const m=epUrl.match(/-(\d+)$/);if(m)number=parseInt(m[1],10);}
-  markWatched(animeSlug,animeTitle,number,coverImg);
-  if(animeTitle)setMeta('Episodio '+number+' · '+animeTitle+' · AnimeStream','Mira '+animeTitle+' - Episodio '+number+' online gratis y sin anuncios en AnimeStream.');
-  const sorted=Array.isArray(servers)?sortServers(servers):[];
-  const idx=eps.findIndex(e=>e.num===number),prev=idx>0?eps[idx-1]:null,next=(idx>=0&&idx<eps.length-1)?eps[idx+1]:null;
-  const cvSafe=safeStr(coverImg);
-  const srvBtns=sorted.map((s,i)=>'<button class="srv-btn'+(i===0?' on':'')+'" id="srv'+i+'" onclick="switchSrv('+i+')">'+(s.name||'Servidor '+(i+1))+'</button>').join('');
-  const dlLinks=sorted.filter(s=>s.file_url).map(s=>'<a href="'+s.file_url+'" target="_blank" rel="noopener" class="dl-link">Descargar ('+s.name+')</a>').join('');
-  const prevBtn=prev?'<a class="btn btn-ghost btn-sm" href="'+playerLink(prev.url,prev.num)+'">Anterior</a>':'';
-  const nextBtn=next?'<a class="btn btn-primary btn-sm" href="'+playerLink(next.url,next.num)+'">Siguiente</a>':'';
-  let epListHtml='';
-  if(eps.length)epListHtml='<div style="margin-top:22px"><div class="sec-head"><div class="sec-title" style="font-size:16px">Lista de episodios</div></div><div class="ep-list">'+eps.slice(0,60).map(ep=>{const w=isWatched(animeSlug,ep.num),cur=ep.num===number;return'<a class="el-item'+(w?' watched':'')+(cur?' current':'')+'" href="'+playerLink(ep.url,ep.num)+'"><div class="el-num">'+ep.num+'</div><div class="el-meta"><div class="el-ltitle">Episodio '+ep.num+'</div><div class="el-lsub">'+(cur?'Reproduciendo':w?'Visto':'Sin ver')+'</div></div></a>';}).join('')+'</div></div>';
-  body.innerHTML=
-    '<a class="back-btn" href="'+detailLink(animeSlug)+'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12,19 5,12 12,5"/></svg>'+(animeTitle?(animeTitle.length>28?animeTitle.slice(0,25)+'...':animeTitle):'Volver al anime')+'</a>'+
-    '<div class="player-wrap"><div class="player-top"><div><div class="player-t">'+(animeTitle||'Episodio')+'</div><div class="player-sub">Episodio '+number+' &middot; '+sorted.length+' servidor'+(sorted.length!==1?'es':'')+'</div></div>'+
-    '<button class="btn btn-secondary btn-sm" onclick="toggleFav(\''+animeSlug+'\',\''+safeStr(animeTitle)+'\',\''+cvSafe+'\',event)">'+(S.favs[animeSlug]?'En favoritos':'Guardar anime')+'</button></div>'+
-    '<div class="player-screen" id="pscreen">'+buildIframe(sorted[0])+'</div>'+
-    '<div class="player-foot"><span class="srv-label">Servidor:</span>'+srvBtns+dlLinks+'<div class="pnav">'+prevBtn+nextBtn+'</div></div></div>'+epListHtml;
-  window.__srvs=sorted;
-  window.switchSrv=function(i){
-    document.querySelectorAll('.srv-btn').forEach((b,j)=>b.classList.toggle('on',i===j));
-    document.getElementById('pscreen').innerHTML=buildIframe(window.__srvs[i]);
-  };
-}
-loadPlayer();
-</script>
+      const [servers, animeData] = await Promise.all([req(epUrl), req('/anime/tioanime/name/' + animeSlug)]);
+      if (animeData) {
+        if (!animeTitle) animeTitle = animeData.name;
+        if (!coverImg) coverImg = (animeData.image && animeData.image.url) || '';
+      }
+      const eps = animeData && Array.isArray(animeData.episodes) ? animeData.episodes.slice().reverse() : [];
+      if (!number && eps.length) { const m = epUrl.match(/-(\d+)$/); if (m) number = parseInt(m[1], 10); }
+      markWatched(animeSlug, animeTitle, number, coverImg);
+      if (animeTitle) setMeta('Episodio ' + number + ' · ' + animeTitle + ' · AnimeStream', 'Mira ' + animeTitle + ' - Episodio ' + number + ' online gratis y sin anuncios en AnimeStream.');
+      const sorted = Array.isArray(servers) ? sortServers(servers) : [];
+      const idx = eps.findIndex(e => e.num === number), prev = idx > 0 ? eps[idx - 1] : null, next = (idx >= 0 && idx < eps.length - 1) ? eps[idx + 1] : null;
+      const cvSafe = safeStr(coverImg);
+      const srvBtns = sorted.map((s, i) => '<button class="srv-btn' + (i === 0 ? ' on' : '') + '" id="srv' + i + '" onclick="switchSrv(' + i + ')">' + (s.name || 'Servidor ' + (i + 1)) + '</button>').join('');
+      const dlLinks = sorted.filter(s => s.file_url).map(s => '<a href="' + s.file_url + '" target="_blank" rel="noopener" class="dl-link">Descargar (' + s.name + ')</a>').join('');
+      const prevBtn = prev ? '<a class="btn btn-ghost btn-sm" href="' + playerLink(prev.url, prev.num) + '">Anterior</a>' : '';
+      const nextBtn = next ? '<a class="btn btn-primary btn-sm" href="' + playerLink(next.url, next.num) + '">Siguiente</a>' : '';
+      let epListHtml = '';
+      if (eps.length) epListHtml = '<div style="margin-top:22px"><div class="sec-head"><div class="sec-title" style="font-size:16px">Lista de episodios</div></div><div class="ep-list">' + eps.slice(0, 60).map(ep => { const w = isWatched(animeSlug, ep.num), cur = ep.num === number; return '<a class="el-item' + (w ? ' watched' : '') + (cur ? ' current' : '') + '" href="' + playerLink(ep.url, ep.num) + '"><div class="el-num">' + ep.num + '</div><div class="el-meta"><div class="el-ltitle">Episodio ' + ep.num + '</div><div class="el-lsub">' + (cur ? 'Reproduciendo' : w ? 'Visto' : 'Sin ver') + '</div></div></a>'; }).join('') + '</div></div>';
+      body.innerHTML =
+        '<a class="back-btn" href="' + detailLink(animeSlug) + '"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12,19 5,12 12,5"/></svg>' + (animeTitle ? (animeTitle.length > 28 ? animeTitle.slice(0, 25) + '...' : animeTitle) : 'Volver al anime') + '</a>' +
+        '<div class="player-wrap"><div class="player-top"><div><div class="player-t">' + (animeTitle || 'Episodio') + '</div><div class="player-sub">Episodio ' + number + ' &middot; ' + sorted.length + ' servidor' + (sorted.length !== 1 ? 'es' : '') + '</div></div>' +
+        '<button class="btn btn-secondary btn-sm" onclick="toggleFav(\'' + animeSlug + '\',\'' + safeStr(animeTitle) + '\',\'' + cvSafe + '\',event)">' + (S.favs[animeSlug] ? 'En favoritos' : 'Guardar anime') + '</button></div>' +
+        '<div class="player-screen" id="pscreen">' + buildIframe(sorted[0]) + '</div>' +
+        '<div class="player-foot"><span class="srv-label">Servidor:</span>' + srvBtns + dlLinks + '<div class="pnav">' + prevBtn + nextBtn + '</div></div></div>' + epListHtml;
+      window.__srvs = sorted;
+      window.switchSrv = function (i) {
+        document.querySelectorAll('.srv-btn').forEach((b, j) => b.classList.toggle('on', i === j));
+        document.getElementById('pscreen').innerHTML = buildIframe(window.__srvs[i]);
+      };
+    }
+    loadPlayer();
+  </script>
 
 </body>
+
 </html>

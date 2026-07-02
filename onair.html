@@ -1,85 +1,163 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8">
-<meta name="referrer" content="no-referrer">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>En emision · AnimeStream</title>
-<meta name="description" content="Una pagina para ver anime sin anuncios :D">
-<meta property="og:title" content="AnimeStream">
-<meta property="og:description" content="Una pagina para ver anime sin anuncios :D">
-<meta property="og:image" content="https://i.imgur.com/ZkZavVo.png">
-<meta property="og:url" content="https://anime5tream.github.io/onair.html">
-<meta property="og:type" content="website">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="AnimeStream">
-<meta name="twitter:description" content="Una pagina para ver anime sin anuncios :D">
-<meta name="twitter:image" content="https://i.imgur.com/ZkZavVo.png">
-<link rel="icon" type="image/png" href="https://i.imgur.com/ZkZavVo.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
-
+  <meta charset="UTF-8">
+  <meta name="referrer" content="no-referrer">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>En emision · AnimeStream</title>
+  <meta name="description" content="Una pagina para ver anime sin anuncios :D">
+  <meta property="og:title" content="AnimeStream">
+  <meta property="og:description" content="Una pagina para ver anime sin anuncios :D">
+  <meta property="og:image" content="https://i.imgur.com/ZkZavVo.png">
+  <meta property="og:url" content="https://anime5tream.github.io/onair.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AnimeStream">
+  <meta name="twitter:description" content="Una pagina para ver anime sin anuncios :D">
+  <meta name="twitter:image" content="https://i.imgur.com/ZkZavVo.png">
+  <link rel="icon" type="image/png" href="https://i.imgur.com/ZkZavVo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-<div id="app">
-<aside id="sidebar">
-  <a class="s-logo" href="index.html">
-    <div class="s-logo-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polygon points="5,3 19,12 5,21"/></svg></div>
-    <div class="s-logo-text">Anime<span>Stream</span></div>
-  </a>
-  <nav class="s-nav">
-    <div class="s-section">Principal</div>
-    <a class="s-item" href="index.html"><svg class="s-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Inicio</a>
-<a class="s-item" href="explore.html"><svg class="s-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Explorar</a>
-<a class="s-item active" href="onair.html"><svg class="s-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M6.34 6.34a8 8 0 000 11.32M17.66 6.34a8 8 0 010 11.32M3.76 3.76a12 12 0 000 16.48M20.24 3.76a12 12 0 010 16.48"/></svg>En emision</a>
-<a class="s-item" href="favorites.html"><svg class="s-icon" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>Favoritos</a>
-<a class="s-item" href="history.html"><svg class="s-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>Historial</a>
-
-  </nav>
-  <div class="s-bottom">API: jimov-api / TioAnime</div>
-</aside>
-<div id="sb-ov"></div>
-
-<main id="main">
-  <header id="topbar">
-    <button class="menu-btn" onclick="toggleSb()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-    </button>
-    <div class="search-wrap">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input id="search-input" type="text" placeholder="Buscar anime..." autocomplete="off">
-      <div class="search-drop" id="sdrop"></div>
-    </div>
-    <div class="t-right">
-      <a class="t-btn" href="favorites.html" title="Favoritos">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+  <div id="app">
+    <aside id="sidebar">
+      <a class="s-logo" href="index.html">
+        <div class="s-logo-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white"
+            stroke-width="2">
+            <polygon points="5,3 19,12 5,21" />
+          </svg></div>
+        <div class="s-logo-text">Anime<span>Stream</span></div>
       </a>
-    </div>
-  </header>
+      <nav class="s-nav">
+        <div class="s-section">Principal</div>
+        <a class="s-item" href="index.html"><svg class="s-icon" viewBox="0 0 24 24">
+            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+            <polyline points="9,22 9,12 15,12 15,22" />
+          </svg>Inicio</a>
+        <a class="s-item" href="explore.html"><svg class="s-icon" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>Explorar</a>
+        <a class="s-item active" href="onair.html"><svg class="s-icon" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="2" />
+            <path
+              d="M6.34 6.34a8 8 0 000 11.32M17.66 6.34a8 8 0 010 11.32M3.76 3.76a12 12 0 000 16.48M20.24 3.76a12 12 0 010 16.48" />
+          </svg>En emision</a>
+        <a class="s-item" href="favorites.html"><svg class="s-icon" viewBox="0 0 24 24">
+            <path
+              d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
+          </svg>Favoritos</a>
+        <a class="s-item" href="history.html"><svg class="s-icon" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12,6 12,12 16,14" />
+          </svg>Historial</a>
 
-  <div class="page">
-    <div class="sec-head"><div><div class="sec-title">En emision</div><div class="sec-sub">Animes con episodios activos esta temporada</div></div></div>
-    <div class="anime-grid" id="oa-grid"><div class="load" style="grid-column:1/-1"><div class="spin"></div></div></div>
+        <a class="s-item" href="profile.html"><svg class="s-icon" viewBox="0 0 24 24">
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 21v-1a8 8 0 0116 0v1" />
+          </svg>Perfil</a>
+      </nav>
+      <div class="s-bottom">
+        <a class="s-profile" href="profile.html">
+          <div class="s-ava" id="sb-ava"><span id="sb-ini">?</span></div>
+          <div>
+            <div class="s-pname" id="sb-uname">Mi perfil</div>
+            <div class="s-prole" id="sb-role">Recien llegado</div>
+          </div>
+        </a>
+      </div>
+    </aside>
+    <div id="sb-ov"></div>
 
+    <main id="main">
+      <header id="topbar">
+        <button class="menu-btn" onclick="toggleSb()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+        <div class="search-wrap">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <input id="search-input" type="text" placeholder="Buscar anime..." autocomplete="off">
+          <div class="search-drop" id="sdrop"></div>
+        </div>
+        <div class="t-right">
+          <a class="t-btn" href="favorites.html" title="Favoritos">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path
+                d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
+            </svg>
+          </a>
+          <a class="t-btn-avatar" id="topbar-avatar" href="profile.html"><span id="topbar-ini">?</span></a>
+        </div>
+      </header>
+
+      <div class="page">
+        <div class="sec-head">
+          <div>
+            <div class="sec-title">En emision</div>
+            <div class="sec-sub">Animes con episodios activos esta temporada</div>
+          </div>
+        </div>
+        <div class="anime-grid" id="oa-grid">
+          <div class="load" style="grid-column:1/-1">
+            <div class="spin"></div>
+          </div>
+        </div>
+      </div>
+    </main>
   </div>
-</main>
-</div>
-<div class="toast-box" id="toast-box"></div>
+  <div class="toast-box" id="toast-box"></div>
 
-<script src="common.js"></script>
-<script>
-async function loadOnAir(){
-  const grid=document.getElementById('oa-grid');
-  grid.innerHTML='<div class="load" style="grid-column:1/-1"><div class="spin"></div></div>';
-  const d=await req('/anime/tioanime/filter?status=1&sort=recent');
-  const items=(d&&Array.isArray(d.results))?d.results:[];
-  if(!items.length){grid.innerHTML='<div style="color:var(--text3);font-size:13px;grid-column:1/-1;padding:20px 0;text-align:center">No se pudo cargar. La API puede tardar en responder.<br><button class="btn btn-secondary btn-sm" style="margin-top:10px" onclick="loadOnAir()">Reintentar</button></div>';return;}
-  grid.innerHTML=items.map(a=>animeCard(a)).join('');
-}
-loadOnAir();
-</script>
+  <script src="common.js"></script>
+  <script>
+    async function loadOnAir() {
+      const grid = document.getElementById('oa-grid');
+      grid.innerHTML = '<div class="load" style="grid-column:1/-1"><div class="spin"></div><span>Cargando animes en emision...</span></div>';
 
+      const d = await req('/anime/tioanime/filter?status=1');
+      let items = (d && Array.isArray(d.results)) ? d.results : [];
+
+      if (!items.length) {
+        const pool = await getCatalogPoolDetailed();
+        items = pool.filter(a => a.onAir);
+      }
+
+      if (!items.length) {
+        grid.innerHTML = '<div style="color:var(--text3);font-size:13px;grid-column:1/-1;padding:20px 0;text-align:center">No hay animes en emision en este momento.</div>';
+        return;
+      }
+
+      grid.innerHTML = items.slice(0, 60).map(a => {
+        const slug = a.url ? slugFromUrl(a.url) : a.slug;
+        const name = a.name || 'Sin titulo';
+        const imgUrl = (a.image && a.image.url) || a.image || '';
+        const typeStr = a.type ? typeLabel(a.type) : '';
+        const on = !!S.favs[slug];
+
+        const liveBadge = '<span class="ac-live-badge"><span class="ac-live-dot"></span>En emision</span>';
+        return '<a class="ac" href="' + detailLink(slug) + '">' +
+          posterBlock(imgUrl, name, slug, a.type) +
+          '<div class="ac-body"><div class="ac-title">' + name + '</div>' +
+          '<div class="ac-meta">' + (typeStr || '') + '</div>' +
+          liveBadge +
+          '</div></a>';
+      }).join('');
+    }
+    loadOnAir();
+  </script>
 </body>
+
 </html>
