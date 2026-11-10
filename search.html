@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Browse & Search Anime · AnimeStream</title>
+  <meta name="description" content="Explora y busca anime por género, popularidad y estreno en AnimeStream. Una pagina para ver anime sin anuncios :D" />
+  <meta name="keywords" content="anime, ver anime, anime online, buscar anime, browse anime, AnimeStream" />
+
+  <meta property="og:title" content="Browse & Search Anime · AnimeStream" />
+  <meta property="og:description" content="Explora y busca anime por género, popularidad y estreno en AnimeStream." />
+  <meta property="og:image" content="https://i.imgur.com/ZkZavVo.png" />
+  <meta property="og:url" content="https://anime5tream.github.io/browse.html" />
+  <meta property="og:type" content="website" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Browse & Search Anime · AnimeStream" />
+  <meta name="twitter:description" content="Explora y busca anime por género, popularidad y estreno en AnimeStream." />
+  <meta name="twitter:image" content="https://i.imgur.com/ZkZavVo.png" />
+
+  <link rel="icon" type="image/png" href="https://i.imgur.com/ZkZavVo.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="src/css/styles.css" />
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <header id="cr-header" class="sticky top-0 z-40"></header>
+
+  <main class="flex-1 pb-12">
+    <section id="search-filter-bar" class="bg-[#141519] border-b border-[#2B2E36] py-5 sm:py-6 px-4 sm:px-6">
+      <div class="max-w-[1100px] mx-auto space-y-4">
+        <div class="relative">
+          <input id="search-query-input" type="text" placeholder="Search anime..." class="w-full bg-transparent border-b-2 border-brand pb-2 pr-10 text-lg sm:text-xl md:text-2xl font-bold text-white focus:outline-none" />
+          <i data-lucide="search" class="w-5 h-5 sm:w-6 sm:h-6 text-brand absolute right-2 top-1"></i>
+        </div>
+
+        <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2.5 sm:gap-3 pt-2 text-xs">
+          <select id="filter-status" class="bg-[#23252B] border border-[#3E4149] text-white px-3 py-2.5 sm:py-2 font-bold cursor-pointer w-full sm:w-auto">
+            <option value="">All Statuses</option>
+            <option value="emision">Simulcast (En Emisión)</option>
+            <option value="finalizado">Completed (Finalizado)</option>
+            <option value="proximamente">Upcoming (Próximamente)</option>
+          </select>
+
+          <select id="filter-type" class="bg-[#23252B] border border-[#3E4149] text-white px-3 py-2.5 sm:py-2 font-bold cursor-pointer w-full sm:w-auto">
+            <option value="">All Types</option>
+            <option value="tv-anime">TV Anime</option>
+            <option value="pelicula">Movie (Película)</option>
+            <option value="especial">Special</option>
+            <option value="ova">OVA</option>
+            <option value="ona">ONA</option>
+          </select>
+
+          <select id="filter-genre" class="bg-[#23252B] border border-[#3E4149] text-white px-3 py-2.5 sm:py-2 font-bold cursor-pointer w-full sm:w-auto">
+            <option value="">All Genres</option>
+            <option value="accion">Acción / Action</option>
+            <option value="aventura">Aventura / Adventure</option>
+            <option value="ciencia-ficcion">Ciencia Ficción / Sci-Fi</option>
+            <option value="comedia">Comedia / Comedy</option>
+            <option value="deportes">Deportes / Sports</option>
+            <option value="drama">Drama</option>
+            <option value="fantasia">Fantasía / Fantasy</option>
+            <option value="romance">Romance</option>
+          </select>
+
+          <select id="filter-order" class="bg-[#23252B] border border-[#3E4149] text-white px-3 py-2.5 sm:py-2 font-bold cursor-pointer w-full sm:w-auto">
+            <option value="default">Order: Default</option>
+            <option value="popular">Order: Popular</option>
+            <option value="score">Order: Score</option>
+            <option value="title">Order: Title</option>
+            <option value="latest_added">Order: Latest Added</option>
+            <option value="latest_released">Order: Latest Released</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <section id="dynamic-catalog-container" class="max-w-[1380px] mx-auto px-4 sm:px-6 md:px-12 mt-6 sm:mt-10"></section>
+  </main>
+
+  <script src="src/lib/adapters.js"></script>
+  <script src="src/lib/api.js"></script>
+  <script src="src/lib/store.js"></script>
+  <script>
+    const { Api, Store, initSharedLayout, renderPosterCardHTML, bindPosterCardEvents } = window;
+    const params = new URLSearchParams(window.location.search);
+    const viewMode = params.get('view') || '';
+
+    initSharedLayout(viewMode || (params.get('status') === 'emision' ? 'simulcast' : ''));
+
+    const filterBar = document.getElementById('search-filter-bar');
+    const qInput = document.getElementById('search-query-input');
+    const sSelect = document.getElementById('filter-status');
+    const tSelect = document.getElementById('filter-type');
+    const gSelect = document.getElementById('filter-genre');
+    const oSelect = document.getElementById('filter-order');
+    const container = document.getElementById('dynamic-catalog-container');
+
+    if (params.get('status')) sSelect.value = params.get('status');
+    if (params.get('genre')) gSelect.value = params.get('genre');
+    if (params.get('order')) oSelect.value = params.get('order');
+    if (params.get('q')) qInput.value = params.get('q');
+
+    if (viewMode === 'new' || viewMode === 'simulcast') {
+      filterBar.classList.add('hidden');
+    }
+
+    let currentPage = 1;
+    let debounceTimer = null;
+
+    async function renderCatalogView() {
+      container.innerHTML = `
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-5">
+          ${Array.from({ length: 12 }, () => `<div class="aspect-[2/3] skeleton"></div>`).join('')}
+        </div>
+      `;
+
+      if (viewMode === 'new' && !qInput.value.trim()) {
+        const [latestEps, latestAnimes] = await Promise.all([
+          Api.getLatestEpisodes(),
+          Api.searchByFilter({ order: 'latest_added', page: 1 })
+        ]);
+
+        const combined = [...latestEps, ...latestAnimes.media];
+        const last24 = combined.slice(0, 6);
+        const pastWeek = combined.slice(6, 18);
+
+        const drawNew = () => {
+          container.innerHTML = `
+            <div class="flex items-center justify-between mb-6 sm:mb-8">
+              <h1 class="text-xl sm:text-2xl md:text-3xl font-bold">${Store.t('newlyAdded')}</h1>
+              <div class="flex items-center gap-4 sm:gap-6 text-xs font-bold uppercase text-[#A0A0A0]">
+                <button id="btn-toggle-filterbar" class="flex items-center gap-1.5 hover:text-white">
+                  <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+                  <span>FILTER</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="space-y-10 sm:space-y-12">
+              <div>
+                <h2 class="text-base sm:text-lg font-bold mb-4 pb-2 border-b border-[#2B2E36]">${Store.t('last24h')}</h2>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-5">
+                  ${last24.map((item, i) => renderPosterCardHTML(item, i, true)).join('')}
+                </div>
+              </div>
+
+              <div>
+                <h2 class="text-base sm:text-lg font-bold mb-4 pb-2 border-b border-[#2B2E36]">${Store.t('pastWeek')}</h2>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-5">
+                  ${pastWeek.map((item, i) => renderPosterCardHTML(item, i, true)).join('')}
+                </div>
+              </div>
+            </div>
+          `;
+          bindPosterCardEvents(container, drawNew);
+          document.getElementById('btn-toggle-filterbar')?.addEventListener('click', () => {
+            filterBar.classList.toggle('hidden');
+          });
+          if (window.lucide) window.lucide.createIcons();
+        };
+
+        drawNew();
+        return;
+      }
+
+      if (viewMode === 'simulcast' && !qInput.value.trim()) {
+        const res = await Api.searchByFilter({ statuses: ['emision'], order: 'popular', page: currentPage });
+
+        const drawSim = () => {
+          container.innerHTML = `
+            <div class="flex items-center justify-between mb-6 sm:mb-8">
+              <h1 class="text-xl sm:text-2xl md:text-3xl font-bold">${Store.t('simulcastHeader')}</h1>
+              <div class="flex items-center gap-2 text-xs font-bold uppercase text-[#DADADA]">
+                <span>FALL 2026</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-5">
+              ${res.media.map((anime, i) => renderPosterCardHTML(anime, i, false)).join('')}
+            </div>
+          `;
+          bindPosterCardEvents(container, drawSim);
+          if (window.lucide) window.lucide.createIcons();
+        };
+
+        drawSim();
+        return;
+      }
+
+      const query = qInput.value.trim();
+      let res;
+      if (query) {
+        res = await Api.search(query, currentPage);
+      } else {
+        res = await Api.searchByFilter({
+          statuses: sSelect.value ? [sSelect.value] : [],
+          types: tSelect.value ? [tSelect.value] : [],
+          genres: gSelect.value ? [gSelect.value] : [],
+          order: oSelect.value || 'default',
+          page: currentPage
+        });
+      }
+
+      const genreTitle = gSelect.options[gSelect.selectedIndex]?.text || 'Top Results';
+
+      const drawSearch = () => {
+        container.innerHTML = `
+          <div class="flex items-center justify-between mb-5 sm:mb-6">
+            <h2 class="text-lg sm:text-xl md:text-2xl font-bold truncate">${query ? `Results for "${query}"` : (gSelect.value ? genreTitle : 'Top Results')}</h2>
+            <span class="text-xs text-cr-secondary font-bold shrink-0">Page ${res.currentPage} of ${res.foundPages}</span>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-5">
+            ${res.media.map((anime, i) => renderPosterCardHTML(anime, i, false)).join('')}
+          </div>
+
+          <div class="flex items-center justify-center gap-4 mt-10 sm:mt-12">
+            <button id="prev-page-btn" ${res.currentPage <= 1 ? 'disabled' : ''} class="px-5 py-2.5 bg-[#23252B] text-xs font-bold uppercase disabled:opacity-40 hover:bg-[#2B2E36]">Previous</button>
+            <button id="next-page-btn" ${!res.hasNextPage ? 'disabled' : ''} class="px-5 py-2.5 bg-brand text-black text-xs font-black uppercase disabled:opacity-40">Next Page</button>
+          </div>
+        `;
+
+        bindPosterCardEvents(container, drawSearch);
+
+        document.getElementById('prev-page-btn')?.addEventListener('click', () => {
+          if (currentPage > 1) {
+            currentPage--;
+            renderCatalogView();
+          }
+        });
+        document.getElementById('next-page-btn')?.addEventListener('click', () => {
+          currentPage++;
+          renderCatalogView();
+        });
+
+        if (window.lucide) window.lucide.createIcons();
+      };
+
+      drawSearch();
+    }
+
+    qInput.addEventListener('input', () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        currentPage = 1;
+        renderCatalogView();
+      }, 350);
+    });
+
+    [sSelect, tSelect, gSelect, oSelect].forEach(sel => {
+      sel.addEventListener('change', () => {
+        currentPage = 1;
+        renderCatalogView();
+      });
+    });
+
+    renderCatalogView();
+  </script>
+</body>
+</html>

@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AnimeStream · Watch Anime Online</title>
+  <meta name="description" content="Una pagina para ver anime sin anuncios :D" />
+
+  <meta property="og:title" content="AnimeStream" />
+  <meta property="og:description" content="Una pagina para ver anime sin anuncios :D" />
+  <meta property="og:image" content="https://i.imgur.com/ZkZavVo.png" />
+  <meta property="og:url" content="https://anime5tream.github.io/" />
+  <meta property="og:type" content="website" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="AnimeStream" />
+  <meta name="twitter:description" content="Una pagina para ver anime sin anuncios :D" />
+  <meta name="twitter:image" content="https://i.imgur.com/ZkZavVo.png" />
+
+  <link rel="icon" type="image/png" href="https://i.imgur.com/ZkZavVo.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="src/css/styles.css" />
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <div id="adventure-gate" class="hidden fixed inset-0 z-[100] adventure-gate-root text-white flex flex-col items-center justify-center p-6 select-none overflow-hidden">
+    <img id="adventure-random-bg" src="" alt="Adventure Wallpaper" class="adventure-art-img" />
+    <div class="adventure-blue-overlay"></div>
+
+    <button id="shuffle-adventure-bg-btn" type="button" class="absolute top-5 right-5 z-20 px-3 py-1.5 rounded-full bg-black/50 hover:bg-black/80 border border-white/20 text-[11px] font-bold text-gray-200 flex items-center gap-1.5 backdrop-blur transition">
+      <i data-lucide="sparkles" class="w-3.5 h-3.5 text-brand"></i>
+      <span id="adventure-bg-label">Wallpaper</span>
+    </button>
+
+    <div class="relative z-10 flex flex-col items-center w-full max-w-3xl">
+      <h1 id="gate-title" class="text-2xl sm:text-3xl md:text-4xl font-bold mb-10 md:mb-12 tracking-wide text-center drop-shadow-md">
+        Who's going on an adventure?
+      </h1>
+
+      <div id="adventure-profiles-row" class="flex flex-wrap items-center justify-center gap-6 md:gap-10"></div>
+
+      <form id="new-profile-form" class="hidden mt-8 bg-[#141519]/95 border border-[#2B2E36] p-4 flex items-center gap-3 shadow-2xl">
+        <input id="new-profile-name" type="text" placeholder="Profile Name" required class="bg-[#23252B] px-3 py-2 text-sm text-white focus:outline-none border border-[#3E4149] focus:border-brand" />
+        <button type="submit" class="bg-brand text-black font-bold text-xs uppercase px-4 py-2.5">Create</button>
+      </form>
+
+      <div class="mt-12 md:mt-14 flex flex-col items-center gap-5">
+        <a id="gate-manage-btn" href="preferences.html?tab=profile" class="px-6 py-2.5 border border-white/70 hover:border-white bg-black/25 backdrop-blur-sm text-xs font-bold uppercase tracking-widest transition-colors">
+          MANAGE PROFILES
+        </a>
+        <button id="gate-close-btn" class="text-sm font-semibold text-gray-300 hover:text-white">
+          Log Out
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <header id="cr-header" class="sticky top-0 z-40"></header>
+
+  <main class="flex-1 pb-12">
+    <section id="hero-section" class="relative w-full h-[510px] sm:h-[550px] md:h-[620px] overflow-hidden bg-black select-none">
+      <div id="hero-slide-content" class="w-full h-full">
+        <div class="w-full h-full skeleton"></div>
+      </div>
+
+      <button id="hero-prev" class="hidden sm:flex absolute left-3 md:left-6 top-1/2 -translate-y-1/2 z-20 p-2 text-white/80 hover:text-white hover:scale-110 transition-all">
+        <i data-lucide="chevron-left" class="w-8 h-8"></i>
+      </button>
+
+      <button id="hero-next" class="hidden sm:flex absolute right-3 md:right-6 top-1/2 -translate-y-1/2 z-20 p-2 text-white/80 hover:text-white hover:scale-110 transition-all">
+        <i data-lucide="chevron-right" class="w-8 h-8"></i>
+      </button>
+    </section>
+
+    <div class="max-w-[1440px] mx-auto px-4 sm:px-6 md:px-12 space-y-10 md:space-y-14 mt-4 md:-mt-8 relative z-20">
+      <section>
+        <h2 id="lbl-top-picks" class="text-lg sm:text-xl md:text-2xl font-bold mb-3 md:mb-4">Top Picks for You</h2>
+        <div id="top-picks-grid" class="cr-mobile-rail grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-5">
+          <div class="aspect-[2/3] skeleton"></div>
+          <div class="aspect-[2/3] skeleton"></div>
+          <div class="aspect-[2/3] skeleton"></div>
+          <div class="aspect-[2/3] skeleton"></div>
+          <div class="aspect-[2/3] skeleton"></div>
+          <div class="aspect-[2/3] skeleton"></div>
+        </div>
+      </section>
+
+      <section id="continue-watching-block" class="hidden">
+        <div class="flex items-center justify-between mb-3 md:mb-4">
+          <h2 id="lbl-continue" class="text-lg sm:text-xl md:text-2xl font-bold">Continue Watching</h2>
+          <a id="lbl-view-history" href="preferences.html?tab=history" class="text-xs font-bold uppercase text-brand hover:underline">View History</a>
+        </div>
+        <div id="continue-watching-row" class="cr-mobile-rail grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5"></div>
+      </section>
+
+      <section>
+        <div class="mb-3 md:mb-4">
+          <h2 id="lbl-simulcast-title" class="text-lg sm:text-xl md:text-2xl font-bold">October 2026 Simulcasts</h2>
+          <p id="lbl-simulcast-sub" class="text-xs text-cr-secondary mt-1">Find the best new and continuing simulcasts here!</p>
+        </div>
+        <div id="simulcast-home-grid" class="cr-mobile-rail grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-5"></div>
+      </section>
+
+      <section>
+        <div class="flex items-center justify-between mb-3 md:mb-4">
+          <h2 id="lbl-new-episodes" class="text-lg sm:text-xl md:text-2xl font-bold">New Episodes</h2>
+          <a id="lbl-view-all" href="search.html?view=new" class="text-xs font-bold uppercase text-brand hover:underline">View All</a>
+        </div>
+        <div id="latest-episodes-row" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5 md:gap-4"></div>
+      </section>
+    </div>
+  </main>
+
+  <script src="src/lib/adapters.js"></script>
+  <script src="src/lib/api.js"></script>
+  <script src="src/lib/store.js"></script>
+  <script>
+    const { Api, Store, initSharedLayout, renderPosterCardHTML, bindPosterCardEvents } = window;
+    initSharedLayout();
+
+    document.getElementById('gate-title').textContent = Store.t('whoAdventure');
+    document.getElementById('gate-manage-btn').textContent = Store.t('manageProfiles');
+    document.getElementById('gate-close-btn').textContent = Store.t('logOut');
+    document.getElementById('lbl-top-picks').textContent = Store.t('topPicks');
+    document.getElementById('lbl-continue').textContent = Store.t('continueWatching');
+    document.getElementById('lbl-view-history').textContent = Store.t('viewHistory');
+    document.getElementById('lbl-simulcast-title').textContent = Store.t('simulcastSeason');
+    document.getElementById('lbl-simulcast-sub').textContent = Store.t('simulcastSub');
+    document.getElementById('lbl-new-episodes').textContent = Store.t('newEpisodes');
+    document.getElementById('lbl-view-all').textContent = Store.t('viewAll');
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const gate = document.getElementById('adventure-gate');
+    const bgImgEl = document.getElementById('adventure-random-bg');
+    const bgLabelEl = document.getElementById('adventure-bg-label');
+    const state = Store.getState();
+
+    function applyRandomAdventureWallpaper() {
+      const picked = Store.getRandomAdventureBackground();
+      if (!bgImgEl || !picked) return;
+      bgImgEl.onerror = () => {
+        if (picked.fallback && bgImgEl.src !== picked.fallback) {
+          bgImgEl.src = picked.fallback;
+        }
+      };
+      bgImgEl.src = picked.url;
+      if (bgLabelEl) bgLabelEl.textContent = picked.character;
+    }
+
+    function closeAdventureGate() {
+      gate.classList.add('hidden');
+      document.body.classList.remove('gate-locked');
+    }
+
+    function renderAdventureGate() {
+      applyRandomAdventureWallpaper();
+      document.body.classList.add('gate-locked');
+
+      const s = Store.getState();
+      const row = document.getElementById('adventure-profiles-row');
+      row.innerHTML = s.profiles.map(p => `
+        <button data-pid="${p.id}" class="pick-profile-btn group flex flex-col items-center gap-3">
+          <div class="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-2 border-white/85 group-hover:border-brand group-hover:scale-105 transition-all bg-[#141519] shadow-2xl">
+            <img src="${p.avatar}" alt="${p.name}" class="w-full h-full object-cover" />
+          </div>
+          <span class="text-sm font-semibold text-gray-200 group-hover:text-white drop-shadow">${p.name}</span>
+        </button>
+      `).join('') + `
+        <button id="add-new-profile-btn" class="group flex flex-col items-center gap-3">
+          <div class="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full border-2 border-white/65 group-hover:border-white bg-black/65 flex items-center justify-center group-hover:scale-105 transition-all shadow-2xl">
+            <i data-lucide="plus" class="w-10 h-10 text-white stroke-[1.5]"></i>
+          </div>
+          <span class="text-sm font-semibold text-gray-200 group-hover:text-white drop-shadow">${Store.t('addNew')}</span>
+        </button>
+      `;
+
+      if (window.lucide) window.lucide.createIcons();
+
+      document.querySelectorAll('.pick-profile-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          Store.setActiveProfile(btn.dataset.pid);
+          closeAdventureGate();
+          if (urlParams.get('switchProfile')) history.replaceState({}, '', 'index.html');
+          window.location.reload();
+        });
+      });
+
+      document.getElementById('add-new-profile-btn')?.addEventListener('click', () => {
+        document.getElementById('new-profile-form').classList.toggle('hidden');
+      });
+    }
+
+    if (!state.profileSelectedThisSession || urlParams.get('switchProfile') === '1') {
+      gate.classList.remove('hidden');
+      renderAdventureGate();
+    }
+
+    document.getElementById('shuffle-adventure-bg-btn')?.addEventListener('click', () => {
+      applyRandomAdventureWallpaper();
+    });
+
+    document.getElementById('new-profile-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const input = document.getElementById('new-profile-name');
+      if (input.value.trim()) {
+        Store.addProfile(input.value.trim());
+        closeAdventureGate();
+        window.location.reload();
+      }
+    });
+
+    document.getElementById('gate-close-btn')?.addEventListener('click', () => {
+      Store.setActiveProfile(Store.getActiveProfile().id);
+      closeAdventureGate();
+    });
+
+    function renderContinueWatching() {
+      const historyList = Store.getHistory().slice(0, 4);
+      const block = document.getElementById('continue-watching-block');
+      const row = document.getElementById('continue-watching-row');
+      if (!historyList.length) {
+        block.classList.add('hidden');
+        return;
+      }
+      block.classList.remove('hidden');
+      row.innerHTML = historyList.map(h => `
+        <a href="watch.html?slug=${encodeURIComponent(h.slug)}&ep=${h.episodeNumber}" class="cr-ep-card group block">
+          <div class="relative aspect-video bg-[#141519] overflow-hidden">
+            <img src="${h.cover}" alt="${h.animeTitle}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+            <div class="absolute inset-0 flex items-center justify-center bg-black/30">
+              <i data-lucide="play" class="w-10 h-10 text-white fill-current"></i>
+            </div>
+            <div class="absolute bottom-0 inset-x-0 h-1 bg-white/30">
+              <div class="h-full bg-brand w-full"></div>
+            </div>
+          </div>
+          <div class="pt-2">
+            <div class="text-[11px] font-bold uppercase text-cr-secondary truncate">${h.animeTitle}</div>
+            <div class="text-xs sm:text-sm font-bold truncate">E${h.episodeNumber} - ${h.episodeTitle}</div>
+          </div>
+        </a>
+      `).join('');
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    let heroSlides = [];
+    let currentSlide = 0;
+    let autoSlideTimer = null;
+
+    function startAutoCarousel() {
+      clearInterval(autoSlideTimer);
+      autoSlideTimer = setInterval(() => {
+        if (!heroSlides.length) return;
+        currentSlide = (currentSlide + 1) % heroSlides.length;
+        renderHeroSlide();
+      }, 6000);
+    }
+
+    function renderHeroSlide() {
+      if (!heroSlides.length) return;
+      const item = heroSlides[currentSlide];
+      const slug = item.animeSlug || item.slug;
+      const epNum = item.episodeNumber || 1;
+      const inWatchlist = Store.isInWatchlist(slug);
+      const genresText = (item.genres && item.genres.length) ? item.genres.slice(0, 3).join(', ') : 'Fantasy, Adventure';
+      const posterImg = item.posterHD || item.cover;
+      const wideBannerImg = item.bannerHD || item.episodeThumb || posterImg;
+      const container = document.getElementById('hero-slide-content');
+
+      container.innerHTML = `
+        <div class="relative w-full h-full bg-[#000000] overflow-hidden">
+          <!-- En Teléfono (< 768px): Arte Vertical a Pantalla Completa -->
+          <img src="${posterImg}" alt="${item.title}" class="md:hidden animate-hero-bg absolute inset-0 w-full h-full object-cover object-top" />
+
+          <!-- En PC (md+): Imagen 16:9 Panorámica (1280x720 / 1920x1080) desde Kitsu API -->
+          <div class="hidden md:block absolute inset-y-0 right-0 w-full lg:w-[76%] h-full overflow-hidden">
+            <img
+              src="${wideBannerImg}"
+              alt="${item.title}"
+              onerror="if(this.src.includes('maxresdefault')){this.src=this.src.replace('maxresdefault','hqdefault')}else if(this.src!=='${posterImg}'){this.src='${posterImg}'}"
+              class="animate-hero-bg w-full h-full object-cover object-center"
+            />
+          </div>
+
+          <div class="cr-hero-mask absolute inset-0"></div>
+
+          <div class="absolute inset-0 max-w-[1440px] mx-auto px-4 sm:px-10 md:px-16 flex flex-col justify-end md:justify-center pb-6 md:pb-0">
+            <div class="animate-hero-content max-w-lg space-y-2.5 sm:space-y-4 text-center md:text-left mx-auto md:mx-0 w-full">
+              <a href="series.html?slug=${encodeURIComponent(slug)}" class="inline-block hover:opacity-90 transition-opacity">
+                <h1 class="text-2xl sm:text-3xl md:text-5xl font-black tracking-tight text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] leading-tight line-clamp-2">
+                  ${item.title}
+                </h1>
+              </a>
+
+              <div class="flex flex-wrap items-center justify-center md:justify-start gap-1.5 text-xs text-[#DADADA] font-semibold">
+                <span class="px-1.5 py-0.5 bg-[#23252B] text-white font-bold">14+</span>
+                <span class="text-[9px] text-[#A0A0A0]">♦</span>
+                <span>Sub | Dub</span>
+                <span class="text-[9px] text-[#A0A0A0]">♦</span>
+                <span>${genresText}</span>
+              </div>
+
+              <p class="hidden sm:block text-sm text-[#DADADA] line-clamp-3 leading-relaxed">
+                ${item.synopsis}
+              </p>
+
+              <div class="flex items-center justify-center md:justify-start gap-2.5 pt-1.5">
+                <a href="watch.html?slug=${encodeURIComponent(slug)}&ep=${epNum}" class="cr-btn-interactive flex-1 sm:flex-initial justify-center bg-brand text-black font-black text-xs md:text-sm uppercase px-5 py-3 flex items-center gap-2 tracking-wider">
+                  <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+                  <span>${Store.t('startWatching')} E${epNum}</span>
+                </a>
+                <button id="hero-watchlist-btn" class="cr-btn-interactive w-11 h-11 shrink-0 border-2 border-brand text-brand flex items-center justify-center hover:bg-brand/10 bg-black/40" title="Add to Watchlist">
+                  <i data-lucide="bookmark" class="w-5 h-5 ${inWatchlist ? 'fill-current' : ''}"></i>
+                </button>
+              </div>
+
+              <div class="flex items-center justify-center md:justify-start gap-2 pt-3 sm:pt-6">
+                ${heroSlides.map((_, idx) => `
+                  <button data-idx="${idx}" class="hero-dot hero-pill-track h-1.5 rounded-full ${idx === currentSlide ? 'w-10' : 'w-5 hover:bg-white/60'}">
+                    ${idx === currentSlide ? '<span class="hero-pill-fill"></span>' : ''}
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      if (window.lucide) window.lucide.createIcons();
+
+      document.getElementById('hero-watchlist-btn')?.addEventListener('click', () => {
+        Store.toggleWatchlist({ slug, title: item.title, cover: posterImg });
+        renderHeroSlide();
+      });
+
+      document.querySelectorAll('.hero-dot').forEach(dot => {
+        dot.addEventListener('click', () => {
+          currentSlide = Number(dot.dataset.idx);
+          renderHeroSlide();
+          startAutoCarousel();
+        });
+      });
+    }
+
+    const heroSec = document.getElementById('hero-section');
+    let touchStartX = 0;
+    heroSec?.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    heroSec?.addEventListener('touchend', (e) => {
+      const diff = e.changedTouches[0].screenX - touchStartX;
+      if (Math.abs(diff) > 45 && heroSlides.length) {
+        if (diff < 0) {
+          currentSlide = (currentSlide + 1) % heroSlides.length;
+        } else {
+          currentSlide = (currentSlide - 1 + heroSlides.length) % heroSlides.length;
+        }
+        renderHeroSlide();
+        startAutoCarousel();
+      }
+    }, { passive: true });
+
+    async function initDiscover() {
+      renderContinueWatching();
+
+      const [latestList, popularRes] = await Promise.all([
+        Api.getLatestEpisodes(),
+        Api.searchByFilter({ statuses: ['emision'], order: 'popular', page: 1 })
+      ]);
+
+      heroSlides = latestList.slice(0, 6);
+      renderHeroSlide();
+      startAutoCarousel();
+
+      document.getElementById('hero-prev')?.addEventListener('click', () => {
+        currentSlide = (currentSlide - 1 + heroSlides.length) % heroSlides.length;
+        renderHeroSlide();
+        startAutoCarousel();
+      });
+      document.getElementById('hero-next')?.addEventListener('click', () => {
+        currentSlide = (currentSlide + 1) % heroSlides.length;
+        renderHeroSlide();
+        startAutoCarousel();
+      });
+
+      const drawGrids = () => {
+        const topPicksGrid = document.getElementById('top-picks-grid');
+        topPicksGrid.innerHTML = popularRes.media.slice(0, 6).map((anime, i) => renderPosterCardHTML(anime, i)).join('');
+        bindPosterCardEvents(topPicksGrid, drawGrids);
+
+        const simGrid = document.getElementById('simulcast-home-grid');
+        const simItems = popularRes.media.slice(6, 12).length ? popularRes.media.slice(6, 12) : popularRes.media.slice(0, 6);
+        simGrid.innerHTML = simItems.map((anime, i) => renderPosterCardHTML(anime, i)).join('');
+        bindPosterCardEvents(simGrid, drawGrids);
+
+        if (window.lucide) window.lucide.createIcons();
+      };
+
+      drawGrids();
+
+      const latestRow = document.getElementById('latest-episodes-row');
+      latestRow.innerHTML = latestList.slice(0, 12).map(ep => `
+        <a href="watch.html?slug=${encodeURIComponent(ep.animeSlug)}&ep=${ep.episodeNumber}" class="cr-ep-card block group">
+          <div class="relative aspect-video bg-[#141519] overflow-hidden">
+            <img src="${ep.episodeThumb || ep.bannerHD || ep.cover}" alt="${ep.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+            <div class="absolute inset-0 flex items-center justify-center bg-black/25">
+              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/60 flex items-center justify-center">
+                <i data-lucide="play" class="w-4 h-4 sm:w-5 sm:h-5 text-white fill-current ml-0.5"></i>
+              </div>
+            </div>
+            <span class="absolute bottom-1.5 right-1.5 bg-black/80 text-white text-[10px] sm:text-[11px] font-bold px-1.5 py-0.5">23m</span>
+          </div>
+          <div class="pt-2">
+            <div class="text-[10px] font-bold uppercase text-cr-secondary truncate">${ep.title}</div>
+            <div class="text-xs font-bold mt-0.5 truncate">E${ep.episodeNumber} – Episode ${ep.episodeNumber}</div>
+            <div class="text-[11px] text-cr-secondary mt-1">Dub | Sub</div>
+          </div>
+        </a>
+      `).join('');
+
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    initDiscover();
+  </script>
+</body>
+</html>

@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Watch Episode · AnimeStream</title>
+  <meta name="description" content="Reproduce episodios de anime en HD sin anuncios en AnimeStream." />
+  <meta name="robots" content="noindex, nofollow" />
+
+  <meta property="og:title" content="Watch Episode · AnimeStream" />
+  <meta property="og:description" content="Reproduce episodios de anime en HD sin anuncios en AnimeStream." />
+  <meta property="og:image" content="https://i.imgur.com/ZkZavVo.png" />
+  <meta property="og:url" content="https://anime5tream.github.io/watch.html" />
+  <meta property="og:type" content="video.episode" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Watch Episode · AnimeStream" />
+  <meta name="twitter:description" content="Reproduce episodios de anime en HD sin anuncios en AnimeStream." />
+  <meta name="twitter:image" content="https://i.imgur.com/ZkZavVo.png" />
+
+  <link rel="icon" type="image/png" href="https://i.imgur.com/ZkZavVo.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="src/css/styles.css" />
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <header id="cr-header" class="sticky top-0 z-40"></header>
+
+  <main class="flex-1 pb-12">
+    
+    <div class="w-full bg-[#141519] border-b border-[#2B2E36] px-3 sm:px-6 md:px-8 py-2 flex items-center justify-between gap-3 text-xs overflow-x-auto whitespace-nowrap">
+      <div class="flex items-center gap-2 shrink-0">
+        <span class="font-black uppercase text-brand tracking-wider flex items-center gap-1.5">
+          <i data-lucide="tv" class="w-4 h-4"></i>
+          <span class="hidden sm:inline">API Servers:</span>
+        </span>
+        <div id="lang-pills" class="flex items-center gap-1"></div>
+      </div>
+
+      <div id="server-pills" class="flex items-center gap-1.5 shrink-0"></div>
+    </div>
+
+    <section class="w-full bg-black relative select-none">
+      <div id="player-container" class="relative w-full aspect-video md:h-[56vw] md:max-h-[76vh] bg-black overflow-hidden group">
+
+        <div id="mature-advisory" class="absolute top-3 left-3 sm:top-5 sm:left-5 z-20 flex items-center gap-2 sm:gap-3 pointer-events-none transition-opacity duration-700">
+          <span class="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-[#23252B] text-white font-bold text-xs sm:text-sm rounded-sm">14+</span>
+          <span class="text-white font-bold text-xs sm:text-sm drop-shadow">Violence, Suggestive Dialogue</span>
+        </div>
+
+        <iframe
+          id="api-embed-frame"
+          class="w-full h-full border-0 bg-black"
+          allowfullscreen
+          allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+          referrerpolicy="no-referrer"
+        ></iframe>
+
+        <div id="native-player-layer" class="hidden w-full h-full relative">
+          <video id="cr-video" class="w-full h-full object-contain bg-black" playsinline></video>
+
+          <div class="absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black/95 via-black/60 to-transparent pt-8 pb-2.5 sm:pb-3 px-3 sm:px-5">
+            <input id="cr-scrubber" type="range" min="0" max="100" value="0" class="cr-scrubber mb-2.5 sm:mb-3" />
+
+            <div class="flex items-center justify-between text-white">
+              <div class="flex items-center gap-3.5 sm:gap-5">
+                <button id="btn-rw10" class="hover:text-brand transition" title="Rewind 10s">
+                  <i data-lucide="rotate-ccw" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+                </button>
+                <button id="btn-play" class="hover:text-brand transition" title="Play / Pause">
+                  <i data-lucide="pause" class="w-5 h-5 sm:w-6 sm:h-6 fill-current"></i>
+                </button>
+                <button id="btn-fw10" class="hover:text-brand transition" title="Forward 10s">
+                  <i data-lucide="rotate-cw" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+                </button>
+                <button id="btn-vol" class="hover:text-brand transition" title="Mute / Unmute">
+                  <i data-lucide="volume-2" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+                </button>
+                <span id="cr-time-display" class="text-[11px] sm:text-xs font-bold tracking-wide">0:00 / 23:40</span>
+              </div>
+
+              <div class="flex items-center gap-3.5 sm:gap-5">
+                <button id="btn-skip-next" class="hover:text-brand transition" title="Next Episode">
+                  <i data-lucide="skip-forward" class="w-4 h-4 sm:w-5 sm:h-5 fill-current"></i>
+                </button>
+                <button id="btn-cc" class="hidden sm:inline-flex hover:text-brand transition" title="Subtitles / CC">
+                  <i data-lucide="subtitles" class="w-5 h-5"></i>
+                </button>
+                <button id="btn-speed" class="text-xs font-black hover:text-brand transition" title="Playback Speed">
+                  1x
+                </button>
+                <button id="btn-gear" class="hover:text-brand transition" title="Quality Settings">
+                  <i data-lucide="settings" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+                </button>
+                <button id="btn-fs" class="hover:text-brand transition" title="Fullscreen">
+                  <i data-lucide="maximize-2" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="max-w-[1280px] mx-auto px-4 sm:px-6 md:px-10 pt-5 sm:pt-8 grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-10">
+      <div id="watch-left-info" class="lg:col-span-8 space-y-3.5">
+        <div class="h-40 skeleton"></div>
+      </div>
+
+      <div class="lg:col-span-4 space-y-6">
+        <div id="next-episode-section">
+          <h3 id="lbl-next-ep" class="text-xs font-black uppercase tracking-wider text-white mb-3">NEXT EPISODE</h3>
+          <div id="next-episode-card">
+            <div class="h-24 skeleton"></div>
+          </div>
+        </div>
+
+        <div id="prev-episode-section" class="hidden">
+          <h3 id="lbl-prev-ep" class="text-xs font-black uppercase tracking-wider text-white mb-3">PREVIOUS EPISODE</h3>
+          <div id="prev-episode-card"></div>
+        </div>
+
+        <div>
+          <h3 id="lbl-more-eps" class="text-xs font-black uppercase tracking-wider text-[#A0A0A0] mb-3">MORE EPISODES</h3>
+          <div id="more-episodes-list" class="space-y-3 max-h-[380px] sm:max-h-[420px] overflow-y-auto pr-1"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="src/lib/adapters.js"></script>
+  <script src="src/lib/api.js"></script>
+  <script src="src/lib/store.js"></script>
+  <script>
+    const { Api, Store, initSharedLayout } = window;
+    initSharedLayout();
+
+    document.getElementById('lbl-next-ep').textContent = Store.t('nextEpisode');
+    document.getElementById('lbl-prev-ep').textContent = Store.t('prevEpisode');
+    document.getElementById('lbl-more-eps').textContent = Store.t('moreEpisodes');
+
+    setTimeout(() => {
+      const adv = document.getElementById('mature-advisory');
+      if (adv) adv.style.opacity = '0';
+    }, 4000);
+
+    const params = new URLSearchParams(window.location.search);
+    const slug = params.get('slug') || 'sword-art-online';
+    const epNumber = Number(params.get('ep') || 1);
+
+    let embeds = [];
+    let currentLang = 'SUB';
+    let activeEmbedId = '';
+    let speeds = [1, 1.25, 1.5, 2, 0.75];
+    let speedIdx = 0;
+
+    function fmt(sec) {
+      if (!sec || isNaN(sec)) return '0:00';
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60).toString().padStart(2, '0');
+      return `${m}:${s}`;
+    }
+
+    function activateEmbed(srv) {
+      const iframe = document.getElementById('api-embed-frame');
+      const nativeLayer = document.getElementById('native-player-layer');
+      const video = document.getElementById('cr-video');
+
+      if (!srv) return;
+      activeEmbedId = srv.id;
+
+      if (srv.isDirectVideo) {
+        iframe.src = 'about:blank';
+        iframe.classList.add('hidden');
+        nativeLayer.classList.remove('hidden');
+        video.src = srv.url;
+        video.play().catch(() => {});
+      } else {
+        video.pause();
+        nativeLayer.classList.add('hidden');
+        iframe.classList.remove('hidden');
+        iframe.src = srv.url;
+      }
+    }
+
+    function renderServerControls() {
+      const langs = [...new Set(embeds.map(e => e.type))];
+      if (!langs.includes(currentLang) && langs.length) currentLang = langs[0];
+
+      const langPills = document.getElementById('lang-pills');
+      langPills.innerHTML = langs.map(l => `
+        <button data-lang="${l}" class="lang-pill text-[11px] font-black uppercase px-2.5 py-1 rounded transition ${l === currentLang ? 'bg-brand text-black' : 'bg-[#23252B] text-[#A0A0A0] hover:text-white'}">
+          ${l}
+        </button>
+      `).join('');
+
+      const matching = embeds.filter(e => e.type === currentLang);
+      if (!matching.some(m => m.id === activeEmbedId) && matching[0]) {
+        activeEmbedId = matching[0].id;
+      }
+
+      const srvPills = document.getElementById('server-pills');
+      srvPills.innerHTML = matching.map(m => `
+        <button data-id="${m.id}" class="srv-pill text-xs font-bold px-3 py-1 rounded border transition ${m.id === activeEmbedId ? 'border-brand text-brand bg-[#23252B]' : 'border-[#2B2E36] text-[#A0A0A0] hover:text-white'}">
+          ${m.name}
+        </button>
+      `).join('');
+
+      document.querySelectorAll('.lang-pill').forEach(b => {
+        b.addEventListener('click', () => {
+          currentLang = b.dataset.lang;
+          renderServerControls();
+          const first = embeds.find(e => e.type === currentLang);
+          if (first) activateEmbed(first);
+        });
+      });
+
+      document.querySelectorAll('.srv-pill').forEach(b => {
+        b.addEventListener('click', () => {
+          const chosen = embeds.find(e => e.id === b.dataset.id);
+          if (chosen) {
+            activateEmbed(chosen);
+            renderServerControls();
+          }
+        });
+      });
+    }
+
+    function bindVideoEvents(nextEpUrl) {
+      const video = document.getElementById('cr-video');
+      const playBtn = document.getElementById('btn-play');
+      const rwBtn = document.getElementById('btn-rw10');
+      const fwBtn = document.getElementById('btn-fw10');
+      const volBtn = document.getElementById('btn-vol');
+      const scrubber = document.getElementById('cr-scrubber');
+      const timeDisplay = document.getElementById('cr-time-display');
+      const speedBtn = document.getElementById('btn-speed');
+      const fsBtn = document.getElementById('btn-fs');
+      const skipNext = document.getElementById('btn-skip-next');
+      const container = document.getElementById('player-container');
+
+      const togglePlay = () => {
+        if (video.paused) {
+          video.play();
+          playBtn.innerHTML = `<i data-lucide="pause" class="w-5 h-5 sm:w-6 sm:h-6 fill-current"></i>`;
+        } else {
+          video.pause();
+          playBtn.innerHTML = `<i data-lucide="play" class="w-5 h-5 sm:w-6 sm:h-6 fill-current"></i>`;
+        }
+        if (window.lucide) window.lucide.createIcons();
+      };
+
+      playBtn?.addEventListener('click', togglePlay);
+      video?.addEventListener('click', togglePlay);
+      rwBtn?.addEventListener('click', () => { video.currentTime = Math.max(0, video.currentTime - 10); });
+      fwBtn?.addEventListener('click', () => { video.currentTime = Math.min(video.duration || 1420, video.currentTime + 10); });
+
+      volBtn?.addEventListener('click', () => {
+        video.muted = !video.muted;
+        volBtn.innerHTML = `<i data-lucide="${video.muted ? 'volume-x' : 'volume-2'}" class="w-4 h-4 sm:w-5 sm:h-5"></i>`;
+        if (window.lucide) window.lucide.createIcons();
+      });
+
+      video?.addEventListener('timeupdate', () => {
+        const pct = video.duration ? (video.currentTime / video.duration) * 100 : 0;
+        scrubber.value = pct;
+        timeDisplay.textContent = `${fmt(video.currentTime)} / ${video.duration ? fmt(video.duration) : '23:40'}`;
+      });
+
+      scrubber?.addEventListener('input', () => {
+        if (video.duration) {
+          video.currentTime = (scrubber.value / 100) * video.duration;
+        }
+      });
+
+      speedBtn?.addEventListener('click', () => {
+        speedIdx = (speedIdx + 1) % speeds.length;
+        video.playbackRate = speeds[speedIdx];
+        speedBtn.textContent = `${speeds[speedIdx]}x`;
+      });
+
+      fsBtn?.addEventListener('click', () => {
+        if (!document.fullscreenElement) container.requestFullscreen();
+        else document.exitFullscreen();
+      });
+
+      skipNext?.addEventListener('click', () => {
+        if (nextEpUrl) window.location.href = nextEpUrl;
+      });
+    }
+
+    async function initWatch() {
+      const [anime, serverData] = await Promise.all([
+        Api.getAnimeDetails(slug),
+        Api.getEpisodeServers(slug, epNumber)
+      ]);
+
+      embeds = serverData.embeds;
+      if (embeds[0]) {
+        currentLang = embeds[0].type;
+        activateEmbed(embeds[0]);
+      }
+      renderServerControls();
+
+      const epObj = anime.episodes.find(e => e.number === epNumber) || {
+        number: epNumber,
+        title: serverData.title || `Episode ${epNumber}`,
+        cover: anime.bannerHD || anime.cover,
+        duration: '23m',
+        synopsis: anime.synopsis
+      };
+
+      const nextEp = anime.episodes.find(e => e.number === epNumber + 1) || {
+        number: epNumber + 1,
+        title: `Episode ${epNumber + 1}`,
+        cover: anime.bannerHD || anime.cover,
+        duration: '23m'
+      };
+
+      const prevEp = epNumber > 1 ? (anime.episodes.find(e => e.number === epNumber - 1) || {
+        number: epNumber - 1,
+        title: `Episode ${epNumber - 1}`,
+        cover: anime.bannerHD || anime.cover,
+        duration: '23m'
+      }) : null;
+
+      const nextUrl = `watch.html?slug=${encodeURIComponent(anime.slug)}&ep=${nextEp.number}`;
+      bindVideoEvents(nextUrl);
+
+      document.title = `E${epNumber} - ${epObj.title} - Anime5tream`;
+
+      Store.addToHistory({
+        slug: anime.slug,
+        animeTitle: anime.title,
+        episodeNumber: epNumber,
+        episodeTitle: epObj.title,
+        cover: epObj.cover || anime.cover
+      });
+
+      const renderLeftDetails = (expanded = false) => {
+        const inWatchlist = Store.isInWatchlist(anime.slug);
+        const reaction = Store.getEpisodeReaction(anime.slug, epNumber);
+        const leftEl = document.getElementById('watch-left-info');
+
+        leftEl.innerHTML = `
+          <!-- Fila superior: Nombre de Serie en naranja + Bookmark a la derecha con línea divisoria abajo (Captura 8) -->
+          <div class="flex items-center justify-between gap-4 pb-3 border-b border-[#2B2E36]">
+            <a href="series.html?slug=${encodeURIComponent(anime.slug)}" class="text-xs font-black uppercase tracking-wide text-brand hover:underline truncate">
+              ${anime.title}
+            </a>
+
+            <button id="watch-bookmark-btn" class="text-white hover:text-brand transition p-1 shrink-0" title="Add to Watchlist">
+              <i data-lucide="bookmark" class="w-5 h-5 ${inWatchlist ? 'fill-current text-brand' : ''}"></i>
+            </button>
+          </div>
+
+          <!-- Título del Episodio -->
+          <h1 class="text-lg sm:text-xl md:text-2xl font-bold text-white pt-1">
+            E${epNumber} – ${epObj.title}
+          </h1>
+
+          <!-- 14+ ♦ Subtitled -->
+          <div class="flex items-center gap-1.5 text-xs text-[#A0A0A0] font-semibold">
+            <span class="px-1.5 py-0.5 bg-[#23252B] text-white font-bold">${anime.mature ? '14+' : 'PG-13'}</span>
+            <span class="text-[9px]">♦</span>
+            <span>Sub | Dub</span>
+          </div>
+
+          <div class="text-xs font-bold text-white">
+            Released on ${anime.startDate || 'Jan 28, 2026'}
+          </div>
+
+          <!-- Likes, Dislikes y Share 100% Funcionales (Captura 8) -->
+          <div class="flex items-center justify-between pt-2 pb-2">
+            <div class="flex items-center gap-6 text-xs font-bold">
+              <button id="ep-like-btn" class="flex items-center gap-2 transition-transform active:scale-125 ${reaction.vote === 'like' ? 'text-brand' : 'text-white hover:text-brand'}">
+                <i data-lucide="thumbs-up" class="w-5 h-5 ${reaction.vote === 'like' ? 'fill-current' : ''}"></i>
+                <span>${reaction.likes}</span>
+              </button>
+              <button id="ep-dislike-btn" class="flex items-center gap-2 transition-transform active:scale-125 ${reaction.vote === 'dislike' ? 'text-brand' : 'text-white hover:text-brand'}">
+                <i data-lucide="thumbs-down" class="w-5 h-5 ${reaction.vote === 'dislike' ? 'fill-current' : ''}"></i>
+                <span>${reaction.dislikes}</span>
+              </button>
+            </div>
+            <button id="ep-share-btn" class="text-white hover:text-brand p-1">
+              <i data-lucide="share-2" class="w-5 h-5"></i>
+            </button>
+          </div>
+
+          <!-- Descripción + Fila Audio | Japanese con Fade y botón SHOW MORE (Captura 8) -->
+          <div class="pt-1 space-y-3">
+            <p class="text-sm text-white leading-relaxed ${expanded ? '' : 'line-clamp-2'}">
+              ${epObj.synopsis}
+            </p>
+
+            <div class="relative overflow-hidden ${expanded ? '' : 'max-h-[42px]'}">
+              <div class="flex items-center justify-between py-2.5 border-t border-[#2B2E36] text-xs">
+                <span class="font-bold text-[#DADADA]">Audio</span>
+                <span class="text-[#A0A0A0]">Japanese, Español (América Latina)</span>
+              </div>
+
+              <div class="flex items-center justify-between py-2.5 border-t border-[#2B2E36] text-xs">
+                <span class="font-bold text-[#DADADA]">Subtitles</span>
+                <span class="text-[#A0A0A0]">Español (América Latina), English, Português</span>
+              </div>
+
+              <div class="flex items-center justify-between py-2.5 border-t border-b border-[#2B2E36] text-xs">
+                <span class="font-bold text-[#DADADA]">Genres</span>
+                <span class="text-[#A0A0A0]">${anime.genres.join(', ')}</span>
+              </div>
+
+              ${!expanded ? `<div class="absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-black to-transparent pointer-events-none"></div>` : ''}
+            </div>
+
+            <button id="ep-show-more-btn" class="text-xs font-black uppercase text-brand tracking-wider hover:underline block pt-1">
+              ${expanded ? Store.t('showLess') : Store.t('showMore')}
+            </button>
+          </div>
+
+          ${serverData.downloads.length ? `
+            <div class="pt-4">
+              <div class="text-xs font-bold uppercase text-[#A0A0A0] mb-2">Direct Downloads (API)</div>
+              <div class="flex flex-wrap gap-2">
+                ${serverData.downloads.map(d => `
+                  <a href="${d.url}" target="_blank" rel="noopener" class="px-3 py-1.5 bg-[#23252B] hover:bg-brand hover:text-black text-xs font-bold transition">
+                    ${d.name} (${d.type})
+                  </a>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+        `;
+
+        if (window.lucide) window.lucide.createIcons();
+
+        document.getElementById('watch-bookmark-btn')?.addEventListener('click', () => {
+          Store.toggleWatchlist(anime);
+          renderLeftDetails(expanded);
+        });
+
+        document.getElementById('ep-like-btn')?.addEventListener('click', () => {
+          Store.toggleEpisodeReaction(anime.slug, epNumber, 'like');
+          renderLeftDetails(expanded);
+        });
+
+        document.getElementById('ep-dislike-btn')?.addEventListener('click', () => {
+          Store.toggleEpisodeReaction(anime.slug, epNumber, 'dislike');
+          renderLeftDetails(expanded);
+        });
+
+        document.getElementById('ep-share-btn')?.addEventListener('click', () => {
+          navigator.clipboard?.writeText(window.location.href);
+          alert('Episode link copied!');
+        });
+
+        document.getElementById('ep-show-more-btn')?.addEventListener('click', () => {
+          renderLeftDetails(!expanded);
+        });
+      };
+
+      renderLeftDetails(false);
+
+      // Tarjeta NEXT EPISODE idéntica a la Captura 8
+      const nextCard = document.getElementById('next-episode-card');
+      nextCard.innerHTML = `
+        <a href="${nextUrl}" class="flex gap-3.5 group items-center">
+          <div class="relative w-[148px] aspect-video bg-[#141519] shrink-0 overflow-hidden">
+            <img src="${nextEp.cover}" alt="${nextEp.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+            <div class="absolute inset-0 flex items-center justify-center bg-black/25">
+              <div class="w-10 h-10 rounded-full bg-black/65 flex items-center justify-center">
+                <i data-lucide="play" class="w-5 h-5 text-white fill-current ml-0.5"></i>
+              </div>
+            </div>
+            <span class="absolute bottom-1 right-1 bg-black/80 text-white text-[11px] font-bold px-1.5 py-0.5">${nextEp.duration || '23m'}</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="text-xs font-bold text-white group-hover:text-brand line-clamp-2">
+              E${nextEp.number} – ${nextEp.title}
+            </div>
+            <div class="text-xs text-[#A0A0A0] mt-2">Subtitled</div>
+          </div>
+        </a>
+      `;
+
+      // Tarjeta PREVIOUS EPISODE idéntica a la Captura 8
+      const prevSec = document.getElementById('prev-episode-section');
+      const prevCard = document.getElementById('prev-episode-card');
+      if (prevEp) {
+        prevSec.classList.remove('hidden');
+        const prevUrl = `watch.html?slug=${encodeURIComponent(anime.slug)}&ep=${prevEp.number}`;
+        prevCard.innerHTML = `
+          <a href="${prevUrl}" class="flex gap-3.5 group items-center">
+            <div class="relative w-[148px] aspect-video bg-[#141519] shrink-0 overflow-hidden">
+              <img src="${prevEp.cover}" alt="${prevEp.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+              <div class="absolute inset-0 flex items-center justify-center bg-black/25">
+                <div class="w-10 h-10 rounded-full bg-black/65 flex items-center justify-center">
+                  <i data-lucide="play" class="w-5 h-5 text-white fill-current ml-0.5"></i>
+                </div>
+              </div>
+              <span class="absolute bottom-1 right-1 bg-black/80 text-white text-[11px] font-bold px-1.5 py-0.5">${prevEp.duration || '23m'}</span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-bold text-white group-hover:text-brand line-clamp-2">
+                E${prevEp.number} – ${prevEp.title}
+              </div>
+              <div class="text-xs text-[#A0A0A0] mt-2">Subtitled</div>
+            </div>
+          </a>
+        `;
+      } else {
+        prevSec.classList.add('hidden');
+      }
+
+      const moreList = document.getElementById('more-episodes-list');
+      moreList.innerHTML = anime.episodes.map(e => `
+        <a href="watch.html?slug=${encodeURIComponent(anime.slug)}&ep=${e.number}" class="flex gap-3 p-1.5 hover:bg-[#141519] transition-colors ${e.number === epNumber ? 'bg-[#141519] border-l-2 border-brand' : ''}">
+          <div class="w-28 aspect-video bg-[#141519] shrink-0 overflow-hidden relative">
+            <img src="${e.cover}" class="w-full h-full object-cover" />
+          </div>
+          <div class="text-xs min-w-0">
+            <div class="font-bold text-white line-clamp-1">E${e.number} – ${e.title}</div>
+            <div class="text-[11px] text-[#A0A0A0] mt-1">Dub | Sub</div>
+          </div>
+        </a>
+      `).join('');
+
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    initWatch();
+  </script>
+</body>
+</html>

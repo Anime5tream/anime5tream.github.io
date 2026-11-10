@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Account Settings · AnimeStream</title>
+  <meta name="description" content="Configura tu cuenta en AnimeStream. Una pagina para ver anime sin anuncios :D" />
+  <meta name="robots" content="noindex, nofollow" />
+
+  <meta property="og:title" content="Account Settings · AnimeStream" />
+  <meta property="og:description" content="Una pagina para ver anime sin anuncios :D" />
+  <meta property="og:image" content="https://i.imgur.com/ZkZavVo.png" />
+  <meta property="og:url" content="https://anime5tream.github.io/settings.html" />
+  <meta property="og:type" content="website" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Account Settings · AnimeStream" />
+  <meta name="twitter:description" content="Una pagina para ver anime sin anuncios :D" />
+  <meta name="twitter:image" content="https://i.imgur.com/ZkZavVo.png" />
+
+  <link rel="icon" type="image/png" href="https://i.imgur.com/ZkZavVo.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="src/css/styles.css" />
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <header id="cr-header" class="sticky top-0 z-40"></header>
+
+  <main class="flex-1 max-w-[1120px] w-full mx-auto px-4 sm:px-6 md:px-10 py-6 sm:py-12">
+    <h1 id="lbl-account-settings" class="text-xl sm:text-2xl md:text-3xl font-bold mb-6 sm:mb-10">Account Settings</h1>
+    <div id="mobile-settings-tabs" class="md:hidden flex items-center gap-2 overflow-x-auto pb-3 mb-5 border-b border-cr whitespace-nowrap text-xs font-bold"></div>
+
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-10 items-start">
+      <aside id="desktop-settings-sidebar" class="hidden md:block md:col-span-3 space-y-7 text-sm"></aside>
+      <section id="settings-card" class="md:col-span-9 bg-cr-elevated p-5 sm:p-8 md:p-12 rounded-sm shadow-xl animate-card-in"></section>
+    </div>
+  </main>
+
+  <script src="src/lib/adapters.js"></script>
+  <script src="src/lib/api.js"></script>
+  <script src="src/lib/store.js"></script>
+  <script>
+    const { BRAND_CONFIG, Store, initSharedLayout } = window;
+    initSharedLayout();
+
+    const params = new URLSearchParams(window.location.search);
+    let currentTab = params.get('tab') || 'preferences';
+
+    function renderNavigationMenus() {
+      const isEs = Store.getLangCode() === 'es';
+      document.getElementById('lbl-account-settings').textContent = isEs ? 'Ajustes de la Cuenta' : 'Account Settings';
+
+      const mobileTabs = document.getElementById('mobile-settings-tabs');
+      mobileTabs.innerHTML = `
+        <button data-tab="preferences" class="settings-nav-btn px-3.5 py-2 rounded bg-cr-elevated">${isEs ? 'Preferencias' : 'Preferences'}</button>
+        <button data-tab="profile" class="settings-nav-btn px-3.5 py-2 rounded bg-cr-elevated">${isEs ? 'Perfil y Avatar' : 'Profile & Avatar'}</button>
+        <button data-tab="stats" class="settings-nav-btn px-3.5 py-2 rounded bg-cr-elevated">${isEs ? 'Estadísticas' : 'Stats'}</button>
+        <button data-tab="theme" class="settings-nav-btn px-3.5 py-2 rounded bg-cr-elevated">${isEs ? 'Tema y Color' : 'Theme & Color'}</button>
+        <button data-tab="watchlist" class="settings-nav-btn px-3.5 py-2 rounded bg-cr-elevated">${isEs ? 'Favoritos' : 'Watchlist'}</button>
+        <button data-tab="history" class="settings-nav-btn px-3.5 py-2 rounded bg-cr-elevated">${isEs ? 'Historial' : 'History'}</button>
+      `;
+
+      const desktopSidebar = document.getElementById('desktop-settings-sidebar');
+      desktopSidebar.innerHTML = `
+        <div>
+          <h3 class="font-bold text-cr-primary mb-3">General</h3>
+          <ul class="space-y-3 text-cr-secondary font-semibold">
+            <li><button data-tab="stats" class="settings-nav-btn hover:text-cr-primary transition-colors">${isEs ? 'Estadísticas' : 'Activity & Stats'}</button></li>
+            <li><button data-tab="preferences" class="settings-nav-btn hover:text-cr-primary transition-colors">${isEs ? 'Preferencias' : 'Preferences'}</button></li>
+            <li><button data-tab="profile" class="settings-nav-btn hover:text-cr-primary transition-colors">${isEs ? 'Perfil y Avatar' : 'Profile & Avatar'}</button></li>
+            <li><button data-tab="theme" class="settings-nav-btn hover:text-cr-primary transition-colors">${isEs ? 'Tema y Color Principal' : 'Theme & Brand Color'}</button></li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="font-bold text-cr-primary mb-3">${isEs ? 'Mis Listas' : 'My Lists'}</h3>
+          <ul class="space-y-3 text-cr-secondary font-semibold">
+            <li><button data-tab="watchlist" class="settings-nav-btn hover:text-cr-primary transition-colors">${isEs ? 'Watchlist (Favoritos)' : 'Watchlist (Favorites)'}</button></li>
+            <li><button data-tab="history" class="settings-nav-btn hover:text-cr-primary transition-colors">${isEs ? 'Historial de Reproducción' : 'Watch History'}</button></li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="font-bold text-cr-primary mb-3">${isEs ? 'Gestión de Datos' : 'Data Management'}</h3>
+          <ul class="space-y-3 text-cr-secondary font-semibold">
+            <li><button id="sidebar-clear-history" class="hover:text-red-400 transition-colors">${isEs ? 'Limpiar Historial' : 'Clear Watch History'}</button></li>
+            <li><button id="sidebar-clear-watchlist" class="hover:text-red-400 transition-colors">${isEs ? 'Limpiar Favoritos' : 'Clear Watchlist'}</button></li>
+          </ul>
+        </div>
+      `;
+
+      document.querySelectorAll('.settings-nav-btn').forEach(btn => {
+        if (btn.dataset.tab === currentTab) {
+          btn.classList.add('text-brand');
+          btn.classList.remove('text-cr-secondary');
+        } else {
+          btn.classList.remove('text-brand');
+          btn.classList.add('text-cr-secondary');
+        }
+        btn.addEventListener('click', () => {
+          currentTab = btn.dataset.tab;
+          renderNavigationMenus();
+          renderTabContent();
+        });
+      });
+
+      document.getElementById('sidebar-clear-history')?.addEventListener('click', () => {
+        Store.clearHistory();
+        currentTab = 'history';
+        renderNavigationMenus();
+        renderTabContent();
+      });
+
+      document.getElementById('sidebar-clear-watchlist')?.addEventListener('click', () => {
+        Store.clearWatchlist();
+        currentTab = 'watchlist';
+        renderNavigationMenus();
+        renderTabContent();
+      });
+    }
+
+    function renderTabContent() {
+      const profile = Store.getActiveProfile();
+      const state = Store.getState();
+      const stats = Store.getStats();
+      const isEs = Store.getLangCode() === 'es';
+      const card = document.getElementById('settings-card');
+
+      if (currentTab === 'preferences') {
+        card.innerHTML = `
+          <div class="max-w-lg mx-auto animate-card-in">
+            <div class="text-center mb-8 sm:mb-10">
+              <h2 class="text-xl sm:text-2xl font-bold">${isEs ? `Preferencias para ${profile.name}` : `Preferences for ${profile.name}`}</h2>
+              <p class="text-xs text-cr-secondary mt-1">${isEs ? 'Configura tu idioma y preferencias de video' : 'Set your language and video preferences'}</p>
+            </div>
+
+            <div class="space-y-6 mb-10">
+              <h3 class="text-base font-bold">General</h3>
+              <div class="relative">
+                <label class="block text-[11px] text-cr-secondary mb-1">${isEs ? 'Idioma de visualización' : 'Display Language'}</label>
+                <div class="relative">
+                  <select id="pref-display-lang" class="cr-underline-select">
+                    <option value="Español (América Latina)" ${profile.displayLanguage.includes('Español') ? 'selected' : ''}>Español (América Latina)</option>
+                    <option value="English (US)" ${profile.displayLanguage.includes('English') ? 'selected' : ''}>English (US)</option>
+                  </select>
+                  <i data-lucide="chevron-down" class="w-4 h-4 absolute right-0 top-2 pointer-events-none text-cr-secondary"></i>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-7">
+              <h3 class="text-base font-bold">Video</h3>
+
+              <div class="relative">
+                <label class="block text-[11px] text-cr-secondary mb-1">${isEs ? 'Idioma de audio' : 'Audio Language'}</label>
+                <div class="relative">
+                  <select id="pref-audio-lang" class="cr-underline-select">
+                    <option ${profile.audioLanguage === 'Japanese' ? 'selected' : ''}>Japanese</option>
+                    <option ${profile.audioLanguage === 'Español (América Latina)' ? 'selected' : ''}>Español (América Latina)</option>
+                    <option ${profile.audioLanguage === 'English' ? 'selected' : ''}>English</option>
+                  </select>
+                  <i data-lucide="chevron-down" class="w-4 h-4 absolute right-0 top-2 pointer-events-none text-cr-secondary"></i>
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <div class="flex items-center justify-between gap-4">
+                  <span class="text-sm font-bold">${isEs ? 'Preferir descripciones de audio' : 'Prefer Audio Descriptions'}</span>
+                  <button id="sw-audio-desc" class="cr-switch shrink-0 ${profile.preferAudioDescriptions ? 'active' : ''}">
+                    <span class="cr-switch-thumb">${profile.preferAudioDescriptions ? '✓' : '✕'}</span>
+                  </button>
+                </div>
+                <p class="text-xs text-cr-secondary leading-relaxed">
+                  ${isEs
+                    ? 'Al activar esta opción, reproduciremos automáticamente las descripciones de audio cuando estén disponibles.'
+                    : 'By enabling this setting, we will automatically play audio descriptions when available.'}
+                </p>
+              </div>
+
+              <div class="relative">
+                <label class="block text-[11px] text-cr-secondary mb-1">${isEs ? 'Idioma de subtítulos / CC' : 'Subtitles/CC Language'}</label>
+                <div class="relative">
+                  <select id="pref-sub-lang" class="cr-underline-select">
+                    <option ${profile.subtitleLanguage === 'Español (América Latina)' ? 'selected' : ''}>Español (América Latina)</option>
+                    <option ${profile.subtitleLanguage === 'English' ? 'selected' : ''}>English</option>
+                    <option ${profile.subtitleLanguage === 'Español (España)' ? 'selected' : ''}>Español (España)</option>
+                  </select>
+                  <i data-lucide="chevron-down" class="w-4 h-4 absolute right-0 top-2 pointer-events-none text-cr-secondary"></i>
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <div class="flex items-center justify-between gap-4">
+                  <span class="text-sm font-bold">${isEs ? 'Preferir subtítulos descriptivos (CC)' : 'Prefer Closed Captions'}</span>
+                  <button id="sw-cc" class="cr-switch shrink-0 ${profile.preferClosedCaptions ? 'active' : ''}">
+                    <span class="cr-switch-thumb">${profile.preferClosedCaptions ? '✓' : '✕'}</span>
+                  </button>
+                </div>
+                <p class="text-xs text-cr-secondary leading-relaxed">
+                  ${isEs
+                    ? 'Al activar esta opción, mostraremos automáticamente subtítulos descriptivos (CC) cuando estén disponibles.'
+                    : 'By enabling this setting, we will automatically display closed captions when available.'}
+                </p>
+              </div>
+
+              <div class="relative">
+                <label class="block text-[11px] text-cr-secondary mb-1">${isEs ? 'Contenido de video para adultos' : 'Mature Video Content'}</label>
+                <div class="relative">
+                  <select id="pref-mature" class="cr-underline-select">
+                    <option value="Ages 18 and up" ${profile.matureContent === 'Ages 18 and up' ? 'selected' : ''}>${isEs ? 'Mayores de 18 años' : 'Ages 18 and up'}</option>
+                    <option value="Ages 16 and up" ${profile.matureContent === 'Ages 16 and up' ? 'selected' : ''}>${isEs ? 'Mayores de 16 años' : 'Ages 16 and up'}</option>
+                    <option value="Ages 13 and up" ${profile.matureContent === 'Ages 13 and up' ? 'selected' : ''}>${isEs ? 'Mayores de 13 años' : 'Ages 13 and up'}</option>
+                  </select>
+                  <i data-lucide="chevron-down" class="w-4 h-4 absolute right-0 top-2 pointer-events-none text-cr-secondary"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+
+        document.getElementById('pref-display-lang')?.addEventListener('change', e => {
+          Store.updateActiveProfile({ displayLanguage: e.target.value });
+          initSharedLayout();
+          renderNavigationMenus();
+          renderTabContent();
+        });
+        document.getElementById('pref-audio-lang')?.addEventListener('change', e => Store.updateActiveProfile({ audioLanguage: e.target.value }));
+        document.getElementById('pref-sub-lang')?.addEventListener('change', e => Store.updateActiveProfile({ subtitleLanguage: e.target.value }));
+        document.getElementById('pref-mature')?.addEventListener('change', e => Store.updateActiveProfile({ matureContent: e.target.value }));
+
+        document.getElementById('sw-audio-desc')?.addEventListener('click', () => {
+          Store.updateActiveProfile({ preferAudioDescriptions: !profile.preferAudioDescriptions });
+          renderTabContent();
+        });
+        document.getElementById('sw-cc')?.addEventListener('click', () => {
+          Store.updateActiveProfile({ preferClosedCaptions: !profile.preferClosedCaptions });
+          renderTabContent();
+        });
+      }
+
+      else if (currentTab === 'stats') {
+        card.innerHTML = `
+          <div class="max-w-2xl mx-auto space-y-8 animate-card-in">
+            <div class="text-center">
+              <h2 class="text-xl sm:text-2xl font-bold">${isEs ? `Estadísticas de ${profile.name}` : `Stats & Activity for ${profile.name}`}</h2>
+              <p class="text-xs text-cr-secondary mt-1">${isEs ? 'Guardado localmente por perfil en tu navegador' : 'Stored locally per profile in your browser'}</p>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 sm:gap-4">
+              <div class="p-4 sm:p-5 bg-cr-secondary border border-cr text-center">
+                <div class="text-2xl sm:text-3xl font-black text-brand">${stats.animesWatched}</div>
+                <div class="text-[11px] sm:text-xs text-cr-secondary mt-1 font-bold uppercase">${isEs ? 'Animes Vistos' : 'Animes Watched'}</div>
+              </div>
+              <div class="p-4 sm:p-5 bg-cr-secondary border border-cr text-center">
+                <div class="text-2xl sm:text-3xl font-black text-brand">${stats.episodesWatched}</div>
+                <div class="text-[11px] sm:text-xs text-cr-secondary mt-1 font-bold uppercase">${isEs ? 'Episodios Vistos' : 'Episodes Watched'}</div>
+              </div>
+              <div class="p-4 sm:p-5 bg-cr-secondary border border-cr text-center">
+                <div class="text-2xl sm:text-3xl font-black text-brand">${stats.minutesWatched}m</div>
+                <div class="text-[11px] sm:text-xs text-cr-secondary mt-1 font-bold uppercase">${isEs ? 'Tiempo Visto' : 'Time Watched'}</div>
+              </div>
+              <div class="p-4 sm:p-5 bg-cr-secondary border border-cr text-center">
+                <div class="text-2xl sm:text-3xl font-black text-brand">${stats.watchlistCount}</div>
+                <div class="text-[11px] sm:text-xs text-cr-secondary mt-1 font-bold uppercase">${isEs ? 'En Mi Lista' : 'In Watchlist'}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      else if (currentTab === 'profile') {
+        card.innerHTML = `
+          <div class="max-w-xl mx-auto space-y-8 animate-card-in">
+            <div class="text-center">
+              <h2 class="text-xl sm:text-2xl font-bold">${isEs ? 'Editar Perfil y Avatar' : 'Edit Profile & Avatar'}</h2>
+              <p class="text-xs text-cr-secondary mt-1">${isEs ? 'Elige tu personaje favorito o cambia de perfil' : 'Customize your username, pick your favorite anime avatar, or switch profiles'}</p>
+            </div>
+
+            <div class="flex flex-col items-center gap-3">
+              <img src="${profile.avatar}" alt="${profile.name}" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-brand shadow-lg" />
+              <span class="font-bold text-xl">${profile.name}</span>
+            </div>
+
+            <div class="space-y-5">
+              <div>
+                <label class="block text-xs font-bold uppercase text-cr-secondary mb-1.5">${isEs ? 'Nombre de Usuario' : 'Username'}</label>
+                <input id="edit-prof-name" type="text" value="${profile.name}" class="w-full bg-cr-secondary border border-cr px-4 py-2.5 text-sm font-bold focus:outline-none focus:border-brand" />
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold uppercase text-cr-secondary mb-3">${isEs ? `Personajes Populares de Anime (${BRAND_CONFIG.avatars.length})` : `Popular Anime Characters (${BRAND_CONFIG.avatars.length})`}</label>
+                <div class="grid grid-cols-3 sm:grid-cols-5 gap-2.5 sm:gap-3">
+                  ${BRAND_CONFIG.avatars.map(item => `
+                    <button type="button" data-av-url="${item.url}" class="av-choice p-2 rounded bg-cr-secondary border-2 flex flex-col items-center gap-1.5 transition-all ${profile.avatar === item.url ? 'border-brand scale-[1.03]' : 'border-transparent opacity-80 hover:opacity-100 hover:border-cr'}">
+                      <img src="${item.url}" alt="${item.name}" class="w-14 h-14 rounded-full object-cover" />
+                      <span class="text-[10px] font-bold text-center line-clamp-1">${item.name}</span>
+                    </button>
+                  `).join('')}
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold uppercase text-cr-secondary mb-1.5">${isEs ? 'O pega una URL de imagen directa' : 'Or Paste Direct Image URL'}</label>
+                <input id="edit-prof-url" type="url" placeholder="https://..." value="${profile.avatar}" class="w-full bg-cr-secondary border border-cr px-4 py-2.5 text-sm focus:outline-none focus:border-brand" />
+              </div>
+
+              <button id="save-profile-btn" class="cr-btn-interactive w-full bg-brand text-black font-black uppercase text-xs py-3.5 tracking-wider">
+                ${isEs ? 'GUARDAR CAMBIOS DEL PERFIL' : 'SAVE PROFILE CHANGES'}
+              </button>
+            </div>
+
+            <div class="pt-6 border-t border-cr space-y-4">
+              <div class="flex items-center justify-between">
+                <h3 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-cr-secondary">${isEs ? 'Tus Perfiles Locales' : 'Your Local Profiles'}</h3>
+                <button id="btn-create-new-profile" class="text-xs font-black uppercase text-brand hover:underline flex items-center gap-1">
+                  <i data-lucide="plus" class="w-4 h-4"></i>
+                  <span>${isEs ? 'Nuevo Perfil' : 'New Profile'}</span>
+                </button>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                ${state.profiles.map(p => `
+                  <div class="p-3 bg-cr-secondary border ${p.id === state.activeProfileId ? 'border-brand' : 'border-cr'} flex items-center justify-between gap-2">
+                    <button type="button" data-switch-id="${p.id}" class="switch-prof-card flex items-center gap-2.5 text-left flex-1 min-w-0">
+                      <img src="${p.avatar}" class="w-10 h-10 rounded-full object-cover shrink-0" />
+                      <div class="truncate">
+                        <div class="text-xs font-bold truncate">${p.name}</div>
+                        <div class="text-[10px] text-brand font-bold">${p.id === state.activeProfileId ? (isEs ? 'Activo' : 'Active') : (isEs ? 'Cambiar' : 'Switch')}</div>
+                      </div>
+                    </button>
+                    ${state.profiles.length > 1 ? `
+                      <button type="button" data-del-id="${p.id}" class="del-prof-btn text-cr-secondary hover:text-red-400 p-1" title="Delete Profile">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                      </button>
+                    ` : ''}
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+
+        document.querySelectorAll('.av-choice').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const url = btn.getAttribute('data-av-url');
+            Store.updateActiveProfile({ avatar: url });
+            initSharedLayout();
+            renderTabContent();
+          });
+        });
+
+        document.getElementById('save-profile-btn')?.addEventListener('click', () => {
+          const nameVal = document.getElementById('edit-prof-name').value.trim();
+          const urlVal = document.getElementById('edit-prof-url').value.trim();
+          const patch = {};
+          if (nameVal) patch.name = nameVal;
+          if (urlVal) patch.avatar = urlVal;
+          Store.updateActiveProfile(patch);
+          initSharedLayout();
+          renderTabContent();
+        });
+
+        document.querySelectorAll('.switch-prof-card').forEach(btn => {
+          btn.addEventListener('click', () => {
+            Store.setActiveProfile(btn.getAttribute('data-switch-id'));
+            initSharedLayout();
+            renderNavigationMenus();
+            renderTabContent();
+          });
+        });
+
+        document.querySelectorAll('.del-prof-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            Store.deleteProfile(btn.getAttribute('data-del-id'));
+            initSharedLayout();
+            renderNavigationMenus();
+            renderTabContent();
+          });
+        });
+
+        document.getElementById('btn-create-new-profile')?.addEventListener('click', () => {
+          const name = prompt(isEs ? 'Nombre del nuevo perfil:' : 'New profile name:', 'Otaku');
+          if (name && name.trim()) {
+            Store.addProfile(name.trim());
+            initSharedLayout();
+            renderNavigationMenus();
+            renderTabContent();
+          }
+        });
+      }
+
+      else if (currentTab === 'theme') {
+        card.innerHTML = `
+          <div class="max-w-lg mx-auto space-y-8 animate-card-in">
+            <div class="text-center">
+              <h2 class="text-xl sm:text-2xl font-bold">${isEs ? 'Apariencia y Color Principal' : 'Appearance & Brand Color'}</h2>
+              <p class="text-xs text-cr-secondary mt-1">${isEs ? 'Elige entre Modo Oscuro, Claro o Sistema y personaliza el color de acento' : 'Switch between Dark, Light or System mode and pick your accent color'}</p>
+            </div>
+
+            <div>
+              <h3 class="text-sm font-bold mb-3">${isEs ? 'Modo de Tema' : 'Theme Mode'}</h3>
+              <div class="grid grid-cols-3 gap-3">
+                ${[
+                  { id: 'dark', label: isEs ? 'Oscuro' : 'Dark' },
+                  { id: 'light', label: isEs ? 'Claro' : 'Light' },
+                  { id: 'system', label: isEs ? 'Sistema' : 'System' }
+                ].map(t => `
+                  <button data-theme="${t.id}" class="theme-mode-btn py-3 px-4 border font-bold text-xs uppercase transition-all ${state.theme === t.id ? 'border-brand text-brand bg-cr-secondary' : 'border-cr text-cr-secondary'}">
+                    ${t.label}
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+
+            <div>
+              <h3 class="text-sm font-bold mb-3">${isEs ? 'Color Principal de la Página' : 'Primary Accent Color'}</h3>
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                ${BRAND_CONFIG.accents.map(acc => `
+                  <button data-hex="${acc.hex}" class="accent-pick-btn p-3 border flex items-center gap-2.5 text-xs font-bold transition-all ${state.accentColor === acc.hex ? 'border-brand bg-cr-secondary' : 'border-cr'}">
+                    <span class="w-5 h-5 rounded-full shrink-0" style="background:${acc.hex}"></span>
+                    <span class="truncate">${acc.name}</span>
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+
+        document.querySelectorAll('.theme-mode-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            Store.setTheme(btn.dataset.theme);
+            renderTabContent();
+          });
+        });
+
+        document.querySelectorAll('.accent-pick-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            Store.setAccentColor(btn.dataset.hex);
+            initSharedLayout();
+            renderNavigationMenus();
+            renderTabContent();
+          });
+        });
+      }
+
+      else if (currentTab === 'watchlist') {
+        const list = Store.getWatchlist();
+        card.innerHTML = `
+          <div class="space-y-6 animate-card-in">
+            <div class="flex items-center justify-between">
+              <div>
+                <h2 class="text-xl sm:text-2xl font-bold">${Store.t('watchlist')} (${list.length})</h2>
+                <p class="text-xs text-cr-secondary">${isEs ? `Guardado en el perfil de ${profile.name}` : `Saved locally for ${profile.name}`}</p>
+              </div>
+              ${list.length ? `<button id="btn-clear-favs" class="text-xs font-bold uppercase text-red-400 hover:underline">${isEs ? 'Limpiar Favoritos' : 'Clear Watchlist'}</button>` : ''}
+            </div>
+
+            ${!list.length ? `<p class="text-sm text-cr-secondary py-12 text-center">${isEs ? 'Tu lista de favoritos está vacía.' : 'Your Watchlist is empty.'}</p>` : `
+              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3.5 sm:gap-4">
+                ${list.map(item => `
+                  <div class="bg-cr-secondary border border-cr overflow-hidden group relative">
+                    <a href="series.html?slug=${encodeURIComponent(item.slug)}" class="block aspect-[2/3] overflow-hidden">
+                      <img src="${item.cover}" class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                    </a>
+                    <div class="p-2.5 flex items-start justify-between gap-2">
+                      <a href="series.html?slug=${encodeURIComponent(item.slug)}" class="text-xs font-bold line-clamp-2 hover:text-brand">${item.title}</a>
+                      <button data-remove="${item.slug}" class="remove-fav-btn text-cr-secondary hover:text-red-400 shrink-0" title="Remove">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                      </button>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            `}
+          </div>
+        `;
+
+        document.getElementById('btn-clear-favs')?.addEventListener('click', () => {
+          Store.clearWatchlist();
+          renderTabContent();
+        });
+
+        document.querySelectorAll('.remove-fav-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            Store.toggleWatchlist({ slug: btn.dataset.remove });
+            renderTabContent();
+          });
+        });
+      }
+
+      else if (currentTab === 'history') {
+        const history = Store.getHistory();
+        card.innerHTML = `
+          <div class="space-y-6 animate-card-in">
+            <div class="flex items-center justify-between">
+              <div>
+                <h2 class="text-xl sm:text-2xl font-bold">${Store.t('history')} (${history.length})</h2>
+                <p class="text-xs text-cr-secondary">${isEs ? `Episodios vistos por ${profile.name}` : `Episodes watched by ${profile.name}`}</p>
+              </div>
+              ${history.length ? `<button id="btn-clear-hist" class="text-xs font-bold uppercase text-red-400 hover:underline">${isEs ? 'Limpiar Historial' : 'Clear History'}</button>` : ''}
+            </div>
+
+            ${!history.length ? `<p class="text-sm text-cr-secondary py-12 text-center">${isEs ? 'Aún no has visto ningún episodio en este perfil.' : 'No episodes watched yet on this profile.'}</p>` : `
+              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 sm:gap-4">
+                ${history.map(h => `
+                  <a href="watch.html?slug=${encodeURIComponent(h.slug)}&ep=${h.episodeNumber}" class="bg-cr-secondary border border-cr overflow-hidden block group">
+                    <div class="aspect-video relative overflow-hidden bg-black">
+                      <img src="${h.cover}" class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                      <div class="absolute bottom-0 inset-x-0 h-1 bg-brand"></div>
+                    </div>
+                    <div class="p-3">
+                      <div class="text-[10px] font-bold uppercase text-cr-secondary truncate">${h.animeTitle}</div>
+                      <div class="text-xs font-bold mt-0.5 truncate">E${h.episodeNumber} - ${h.episodeTitle}</div>
+                    </div>
+                  </a>
+                `).join('')}
+              </div>
+            `}
+          </div>
+        `;
+
+        document.getElementById('btn-clear-hist')?.addEventListener('click', () => {
+          Store.clearHistory();
+          renderTabContent();
+        });
+      }
+
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    renderNavigationMenus();
+    renderTabContent();
+  </script>
+</body>
+</html>
